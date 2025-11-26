@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U.S. Voting Machine Infrastructure Tracker</title>
+    <style>
+        :root {
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-300: rgba(50, 184, 198, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-red-400: rgba(255, 84, 89, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-orange-400: rgba(230, 129, 97, 1);
+            --color-orange-500: rgba(168, 75, 47, 1);
+            
+            --color-brown-600-rgb: 94, 82, 64;
+            --color-teal-500-rgb: 33, 128, 141;
+            --color-slate-900-rgb: 19, 52, 59;
+            --color-red-500-rgb: 192, 21, 47;
+            --color-orange-500-rgb: 168, 75, 47;
+            
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+            --color-error: var(--color-red-500);
+            --color-warning: var(--color-orange-500);
+            
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --space-32: 32px;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-gray-400-rgb: 119, 124, 124;
+                --color-teal-300-rgb: 50, 184, 198;
+                --color-gray-300-rgb: 167, 169, 169;
+                --color-background: var(--color-charcoal-700);
+                --color-surface: var(--color-charcoal-800);
+                --color-text: var(--color-gray-200);
+                --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
+                --color-primary: var(--color-teal-300);
+                --color-border: rgba(var(--color-gray-400-rgb), 0.3);
+                --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
+                --color-error: var(--color-red-400);
+                --color-warning: var(--color-orange-400);
+            }
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: var(--font-family-base);
+            background: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+            padding: var(--space-20);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            margin-bottom: var(--space-32);
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: var(--space-12);
+            color: var(--color-text);
+        }
+        
+        .subtitle {
+            color: var(--color-text-secondary);
+            font-size: 16px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: var(--space-8);
+            margin-bottom: var(--space-24);
+            border-bottom: 1px solid var(--color-border);
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: var(--space-12) var(--space-20);
+            background: none;
+            border: none;
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            color: var(--color-text);
+        }
+        
+        .tab.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-16);
+            margin-bottom: var(--space-32);
+        }
+        
+        .stat-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-20);
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-8);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: var(--space-8);
+        }
+        
+        .stat-description {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: var(--space-16);
+            color: var(--color-text);
+        }
+        
+        .data-table {
+            width: 100%;
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-bottom: var(--space-24);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: rgba(var(--color-teal-500-rgb), 0.08);
+        }
+        
+        th {
+            text-align: left;
+            padding: var(--space-12) var(--space-16);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: var(--space-12) var(--space-16);
+            border-top: 1px solid var(--color-border);
+            font-size: 14px;
+        }
+        
+        tr:hover {
+            background: rgba(var(--color-teal-500-rgb), 0.04);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-critical {
+            background: rgba(var(--color-red-500-rgb), 0.15);
+            color: var(--color-error);
+            border: 1px solid rgba(var(--color-red-500-rgb), 0.25);
+        }
+        
+        .badge-warning {
+            background: rgba(var(--color-orange-500-rgb), 0.15);
+            color: var(--color-warning);
+            border: 1px solid rgba(var(--color-orange-500-rgb), 0.25);
+        }
+        
+        .badge-info {
+            background: rgba(var(--color-teal-500-rgb), 0.15);
+            color: var(--color-primary);
+            border: 1px solid rgba(var(--color-teal-500-rgb), 0.25);
+        }
+        
+        .info-box {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-20);
+            margin-bottom: var(--space-24);
+        }
+        
+        .info-box h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: var(--space-12);
+        }
+        
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .info-box li {
+            padding: var(--space-8) 0;
+            padding-left: var(--space-20);
+            position: relative;
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+        
+        .info-box li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--color-primary);
+            font-weight: bold;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: var(--space-32);
+        }
+        
+        .timeline:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--color-border);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: var(--space-24);
+            padding-left: var(--space-20);
+        }
+        
+        .timeline-item:before {
+            content: "";
+            position: absolute;
+            left: -38px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            border: 2px solid var(--color-background);
+        }
+        
+        .timeline-year {
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: var(--space-8);
+        }
+        
+        .timeline-content {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: var(--space-12);
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-table {
+                overflow-x: auto;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: var(--space-8) var(--space-12);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🗳️ U.S. Voting Machine Infrastructure Tracker</h1>
+            <p class="subtitle">Comprehensive analysis of voting equipment age, security vulnerabilities, and modernization efforts</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="overview">Overview</button>
+            <button class="tab" data-tab="states">State Data</button>
+            <button class="tab" data-tab="funding">Federal Funding</button>
+            <button class="tab" data-tab="incidents">Security Incidents</button>
+            <button class="tab" data-tab="international">International Comparison</button>
+            <button class="tab" data-tab="recommendations">Recommendations</button>
+        </div>
+        
+        <!-- Overview Tab -->
+        <div class="tab-content active" id="overview">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Voters Using 10+ Year Old Equipment</div>
+                    <div class="stat-value">44.6M</div>
+                    <div class="stat-description">Registered voters across 24 states</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Discontinued Equipment</div>
+                    <div class="stat-value">21M</div>
+                    <div class="stat-description">Voters in 23 states using equipment no longer manufactured</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Paperless DRE Systems</div>
+                    <div class="stat-value">~1.4%</div>
+                    <div class="stat-description">Down from 22.4% in 2016 - significant progress</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Replacement Cost (10 Years)</div>
+                    <div class="stat-value">$1.8B</div>
+                    <div class="stat-description">Estimated funding needed for modernization</div>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <h3>Critical Issues</h3>
+                <ul>
+                    <li><strong>Windows 7 End of Life:</strong> January 14, 2020 - vast majority of 10,000 jurisdictions used Windows 7 or older in 2019</li>
+                    <li><strong>Expected Lifespan:</strong> Voting machines designed for 10-20 years, but reality is "probably closer to 10"</li>
+                    <li><strong>Spare Parts Crisis:</strong> Officials report searching eBay for obsolete components like Zip disks and analog modems</li>
+                    <li><strong>Certification Gap:</strong> EAC will not de-certify existing systems running unsupported operating systems</li>
+                </ul>
+            </div>
+            
+            <h2 class="section-title">Paperless DRE States (Some Counties)</h2>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>State</th>
+                            <th>Status</th>
+                            <th>Modernization Deadline</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Louisiana</strong></td>
+                            <td><span class="badge badge-critical">100% Paperless</span></td>
+                            <td>In process (SB 221, 2021)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Texas</strong></td>
+                            <td><span class="badge badge-critical">~33% Paperless</span></td>
+                            <td>September 1, 2026</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Indiana</strong></td>
+                            <td><span class="badge badge-warning">Partial Paperless</span></td>
+                            <td>2024</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mississippi</strong></td>
+                            <td><span class="badge badge-warning">Partial Paperless</span></td>
+                            <td>2024 Presidential Election</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tennessee</strong></td>
+                            <td><span class="badge badge-warning">Partial Paperless</span></td>
+                            <td>2024</td>
+                        </tr>
+                        <tr>
+                            <td><strong>New Jersey</strong></td>
+                            <td><span class="badge badge-warning">Partial Paperless</span></td>
+                            <td>Funding barriers</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- States Tab -->
+        <div class="tab-content" id="states">
+            <h2 class="section-title">Equipment Status by State</h2>
+            <div class="info-box">
+                <h3>Key Statistics</h3>
+                <ul>
+                    <li><strong>24 states</strong> use principal voting equipment that was first fielded more than 10 years ago</li>
+                    <li><strong>23 states</strong> with nearly 21 million registered voters rely on equipment that is no longer manufactured</li>
+                    <li><strong>26 million registered voters</strong> in 16 states live in jurisdictions using DRE machines for some or all voters</li>
+                    <li><strong>Over 98%</strong> of election jurisdictions use equipment that produces auditable paper records (2024)</li>
+                </ul>
+            </div>
+            
+            <h3 class="section-title">Funding Responsibility</h3>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Funding Model</th>
+                            <th>States</th>
+                            <th>Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>State-Funded</strong></td>
+                            <td>Delaware, Georgia, Louisiana, Oklahoma, Rhode Island, Washington D.C.</td>
+                            <td><span class="badge badge-info">Centralized</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Local-Funded</strong></td>
+                            <td>44 states</td>
+                            <td><span class="badge badge-warning">Fragmented</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>No Funding Source</strong></td>
+                            <td>22 states (reported in surveys)</td>
+                            <td><span class="badge badge-critical">At Risk</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="info-box">
+                <h3>Case Studies: Local Budget Challenges</h3>
+                <ul>
+                    <li><strong>Allegheny County, PA:</strong> New equipment cost = 4x annual election budget</li>
+                    <li><strong>Luzerne County, PA:</strong> New equipment cost = 4x annual election budget</li>
+                    <li><strong>Blanco County, TX:</strong> Total annual election budget = $46,000</li>
+                    <li><strong>Norfolk, VA:</strong> Spent over $630,000 after emergency decertification (2017)</li>
+                    <li><strong>Alexandria, VA:</strong> Spent just under $600,000 from 2018 budget (2017)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Funding Tab -->
+        <div class="tab-content" id="funding">
+            <h2 class="section-title">Federal Election Security Funding Timeline</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-year">2018</div>
+                    <div class="timeline-content">
+                        <strong>$380 million</strong> - First new HAVA appropriation since 2010 (Omnibus Appropriations Act)
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2020</div>
+                    <div class="timeline-content">
+                        <strong>$425 million</strong> - Consolidated Appropriations Act<br>
+                        <strong>$20.3 million</strong> - CARES Act (COVID-19 election expenses)
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2022</div>
+                    <div class="timeline-content">
+                        <strong>$75 million</strong> - Election Security Grants
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2023</div>
+                    <div class="timeline-content">
+                        <strong>$75 million</strong> - Election Security Grants
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2024</div>
+                    <div class="timeline-content">
+                        <strong>$15 million</strong> - Dramatic reduction in funding
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-year">2025</div>
+                    <div class="timeline-content">
+                        <strong>$15 million</strong> - Continued reduced funding
+                    </div>
+                </div>
+            </div>
+            
+            <h2 class="section-title">Replacement Cost Estimates</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">DRE Without Paper Trail</div>
+                    <div class="stat-value">$105M</div>
+                    <div class="stat-description">Immediate replacement needed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Equipment Fielded 2010 or Earlier</div>
+                    <div class="stat-value">$350M</div>
+                    <div class="stat-description">Over 10 years old, end of life</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">5-Year Replacement (2010-2016)</div>
+                    <div class="stat-value">$580M</div>
+                    <div class="stat-description">Near end of expected lifespan</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">10-Year Total Estimate</div>
+                    <div class="stat-value">$1.8B</div>
+                    <div class="stat-description">Full modernization costs</div>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <h3>Spending Analysis (As of August 2024)</h3>
+                <ul>
+                    <li><strong>Total appropriated (2018-2024):</strong> Over $1 billion</li>
+                    <li><strong>Amount spent:</strong> $638 million (63%)</li>
+                    <li><strong>Voting equipment &amp; cybersecurity:</strong> $343 million (56% of spending)</li>
+                    <li><strong>Funding trend:</strong> $805M in 2018-2020 → $165M in 2022-2024 (dramatic decline)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Incidents Tab -->
+        <div class="tab-content" id="incidents">
+            <h2 class="section-title">Documented Security Incidents &amp; Malfunctions</h2>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Location</th>
+                            <th>Incident Type</th>
+                            <th>Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Nov 2023</td>
+                            <td>Northampton County, PA</td>
+                            <td><span class="badge badge-warning">Programming Error</span></td>
+                            <td>Vote flipping on 300+ machines (printed receipts only, votes recorded correctly)</td>
+                        </tr>
+                        <tr>
+                            <td>Nov 2024</td>
+                            <td>Milwaukee, WI</td>
+                            <td><span class="badge badge-warning">Human Error</span></td>
+                            <td>30,000 ballots retabulated, tabulator doors not secured overnight</td>
+                        </tr>
+                        <tr>
+                            <td>Jan 2021</td>
+                            <td>Coffee County, GA</td>
+                            <td><span class="badge badge-critical">Unauthorized Access</span></td>
+                            <td>Trump allies accessed voting systems, software copied, criminal charges filed</td>
+                        </tr>
+                        <tr>
+                            <td>Apr 2024</td>
+                            <td>Coffee County, GA</td>
+                            <td><span class="badge badge-critical">Cyberattack</span></td>
+                            <td>County cut off from state systems, voter access suspended, scope unknown</td>
+                        </tr>
+                        <tr>
+                            <td>Nov 2024</td>
+                            <td>Cambria County, PA</td>
+                            <td><span class="badge badge-warning">Software Malfunction</span></td>
+                            <td>Ballots couldn't be scanned, voting hours extended</td>
+                        </tr>
+                        <tr>
+                            <td>Nov 2024</td>
+                            <td>Apache County, AZ</td>
+                            <td><span class="badge badge-warning">Machine Malfunction</span></td>
+                            <td>Wait times exceeded 2 hours on Navajo Nation</td>
+                        </tr>
+                        <tr>
+                            <td>2015</td>
+                            <td>Virginia</td>
+                            <td><span class="badge badge-critical">Security Vulnerability</span></td>
+                            <td>All WINVote machines decertified statewide (wireless cards, external access)</td>
+                        </tr>
+                        <tr>
+                            <td>2014</td>
+                            <td>Virginia Beach, VA</td>
+                            <td><span class="badge badge-warning">Vote Flipping</span></td>
+                            <td>26 machines, touch screen alignment issues (degrading glue)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="info-box">
+                <h3>CISA Security Advisories</h3>
+                <ul>
+                    <li><strong>June 2022:</strong> CISA issued advisory on 9 vulnerabilities in Dominion Voting Systems software (16 states)</li>
+                    <li><strong>2023:</strong> University of Michigan security analysis found vulnerabilities in "practically every significant attack surface" of Dominion ImageCast X machines</li>
+                    <li><strong>Key vulnerability:</strong> Software flaw allowing malware to spread from election management system to every voting machine in jurisdiction</li>
+                    <li><strong>Authentication broken:</strong> Smartcard protocol "completely broken," enabling counterfeit technician cards</li>
+                    <li><strong>No evidence:</strong> CISA found no evidence these vulnerabilities had been exploited in actual elections</li>
+                </ul>
+            </div>
+            
+            <h3 class="section-title">CISA Status (2025)</h3>
+            <div class="info-box">
+                <ul>
+                    <li><strong>February 2025:</strong> Trump administration dramatically curtailed CISA's election security activities</li>
+                    <li><strong>Operations frozen:</strong> All election security operations frozen pending internal review</li>
+                    <li><strong>EI-ISAC defunded:</strong> Discontinued funding for Election Infrastructure Information Sharing and Analysis Center</li>
+                    <li><strong>Staff dismissed:</strong> ~130 workers including election security advisers dismissed</li>
+                    <li><strong>Status uncertain:</strong> Review findings not released, unclear if support has been restored</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- International Tab -->
+        <div class="tab-content" id="international">
+            <h2 class="section-title">International Electronic Voting Practices</h2>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Country</th>
+                            <th>Status</th>
+                            <th>Year/Details</th>
+                            <th>Key Principle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Germany</strong></td>
+                            <td><span class="badge badge-critical">Banned</span></td>
+                            <td>2009 (unconstitutional ruling)</td>
+                            <td>Public examinability required</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Netherlands</strong></td>
+                            <td><span class="badge badge-critical">Abandoned</span></td>
+                            <td>2008 (lack of confidence)</td>
+                            <td>Transparency concerns</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ireland</strong></td>
+                            <td><span class="badge badge-critical">Abandoned</span></td>
+                            <td>2004 (unreliability)</td>
+                            <td>Machine reliability issues</td>
+                        </tr>
+                        <tr>
+                            <td><strong>United Kingdom</strong></td>
+                            <td><span class="badge badge-warning">Tested, Not Pursued</span></td>
+                            <td>2002-2007 trials</td>
+                            <td>Voter confidence</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Estonia</strong></td>
+                            <td><span class="badge badge-info">Internet Voting</span></td>
+                            <td>21% online voters (2013)</td>
+                            <td>E-identity infrastructure</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Canada</strong></td>
+                            <td><span class="badge badge-info">Municipal Online</span></td>
+                            <td>150+ municipalities (2018)</td>
+                            <td>Hybrid systems with paper backup</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Australia</strong></td>
+                            <td><span class="badge badge-info">Paper-Based</span></td>
+                            <td>Hand-marked paper ballots</td>
+                            <td>Manual counting with oversight</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="info-box">
+                <h3>Key International Lessons</h3>
+                <ul>
+                    <li><strong>Paper Ballot Primacy:</strong> Most democracies emphasize paper ballots as the most transparent and auditable method</li>
+                    <li><strong>Public Verifiability:</strong> German Constitutional Court ruled citizens must be able to verify election processes "without special expert knowledge"</li>
+                    <li><strong>Security Concerns:</strong> Netherlands abandoned DREs after researchers demonstrated side-channel attacks via radio emissions</li>
+                    <li><strong>Estonia Success Factors:</strong> National e-identity infrastructure, vote changing allowed during advance voting, mandatory paper option</li>
+                    <li><strong>Canadian Redundancy:</strong> After 2018 technical failure affecting 51 municipalities, jurisdictions restored paper ballot redundancy</li>
+                    <li><strong>Australia Transparency:</strong> Uses OCR scanning with scrutineer oversight for ballot counting</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Recommendations Tab -->
+        <div class="tab-content" id="recommendations">
+            <h2 class="section-title">Expert Recommendations for Modernization</h2>
+            
+            <div class="info-box">
+                <h3>1. Universal Paper Ballot Requirement</h3>
+                <ul>
+                    <li>Replace all paperless voting machines with systems producing voter-verifiable paper ballots</li>
+                    <li>Over 98% of jurisdictions already compliant as of 2024</li>
+                    <li>Endorsed by 100+ leading computer scientists, NIST research, and Senate Select Committee on Intelligence</li>
+                </ul>
+            </div>
+            
+            <div class="info-box">
+                <h3>2. Risk-Limiting Audits (RLAs)</h3>
+                <ul>
+                    <li>Implement "gold standard" post-election audits using statistical sampling</li>
+                    <li>Provide high confidence that reported outcomes are correct</li>
+                    <li>Approximately half of all states currently conduct some form of post-election audit</li>
+                    <li>Audits must be transparent, allow public/partisan observation, and meet certification deadlines</li>
+                </ul>
+            </div>
+            
+            <div class="info-box">
+                <h3>3. Enhanced Testing &amp; Certification</h3>
+                <ul>
+                    <li>VVSG 2.0 establishes baseline cybersecurity, accessibility, and usability requirements</li>
+                    <li>Mandatory penetration testing of federally certified systems</li>
+                    <li>Proposed SECURE IT Act would codify testing requirements and create vulnerability disclosure program</li>
+                    <li>Allow vetted researchers to test election systems in controlled environments</li>
+                </ul>
+            </div>
+            
+            <div class="info-box">
+                <h3>4. Federal Coordination &amp; Sustained Funding</h3>
+                <ul>
+                    <li>Strengthen CISA's authority as interagency coordinator for election infrastructure</li>
+                    <li>Position EAC as clearinghouse for non-infrastructure best practices</li>
+                    <li>Consolidate all election technology testing and certification within CISA</li>
+                    <li>Establish predictable, sustained funding rather than sporadic emergency appropriations</li>
+                    <li>Estimated need: $1.8 billion over next decade</li>
+                </ul>
+            </div>
+            
+            <div class="info-box">
+                <h3>5. Physical Security &amp; Chain of Custody</h3>
+                <ul>
+                    <li>Bipartisan teams (minimum two people) for all equipment access</li>
+                    <li>Tamper-evident seals with documented serial numbers</li>
+                    <li>Video surveillance of storage areas</li>
+                    <li>Detailed chain-of-custody logging throughout equipment lifecycle</li>
+                    <li>Secure storage in locked facilities with restricted access</li>
+                    <li>Rigorous pre-election logic and accuracy testing</li>
+                </ul>
+            </div>
+            
+            <div class="info-box">
+                <h3>6. Minimize Network Connectivity</h3>
+                <ul>
+                    <li>Ban cellular modems in voting equipment (EAC latest guidelines)</li>
+                    <li>Prefer air-gapped systems isolated from internet connectivity</li>
+                    <li>Remove or disable unnecessary wireless features</li>
+                    <li>Use secure, verified transmission methods for unofficial results</li>
+                </ul>
+            </div>
+            
+            <div class="info-box">
+                <h3>7. Lifecycle Management &amp; Replacement Planning</h3>
+                <ul>
+                    <li>Plan for 10-year replacement cycles rather than waiting for equipment failure</li>
+                    <li>Establish dedicated revenue sources or sinking funds for regular equipment replacement</li>
+                    <li>Vendor contracts must include maintenance support and parts availability guarantees</li>
+                    <li>State-level funding to ensure rural and small counties aren't left behind</li>
+                </ul>
+            </div>
+            
+            <div class="info-box">
+                <h3>8. Transparency &amp; Public Communication</h3>
+                <ul>
+                    <li>Public pre-election testing with observer access</li>
+                    <li>Clear communication about security measures and incident response plans</li>
+                    <li>Accessible audit processes with public results reporting</li>
+                    <li>Proactive debunking of disinformation</li>
+                    <li>Technical excellence must be accompanied by public transparency to build voter confidence</li>
+                </ul>
+            </div>
+            
+            <h3 class="section-title">Current Progress vs. Needs</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Paper Ballot Adoption</div>
+                    <div class="stat-value">98%+</div>
+                    <div class="stat-description">✓ Jurisdictions with auditable paper records</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Post-Election Audits</div>
+                    <div class="stat-value">~50%</div>
+                    <div class="stat-description">⚠ States conducting some form of audit</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Federal Funding</div>
+                    <div class="stat-value">-91%</div>
+                    <div class="stat-description">✗ Decline from 2020 ($425M) to 2025 ($15M)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">CISA Support</div>
+                    <div class="stat-value">Uncertain</div>
+                    <div class="stat-description">✗ Operations frozen Feb 2025, status unclear</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.getAttribute('data-tab');
+                
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

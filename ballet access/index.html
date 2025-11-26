@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ballot Access Explorer - Interactive Map of Voting Barriers</title>
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --danger-red: #dc2626;
+            --text-gray: #6b7280;
+            --light-gray: #f3f4f6;
+            --white: #ffffff;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --dark-bg: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-gray);
+            background-color: var(--light-gray);
+        }
+
+        /* Header and Navigation */
+        header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #1e40af 100%);
+            color: var(--white);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: var(--white);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        section {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: var(--primary-blue);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            color: var(--primary-blue);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 3px solid var(--danger-red);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #1e40af 100%);
+            color: var(--white);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            color: var(--white);
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            opacity: 0.95;
+        }
+
+        /* Stat Cards */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-top: 4px solid var(--danger-red);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--danger-red);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-gray);
+        }
+
+        /* Interactive State Selector */
+        .state-selector {
+            margin: 2rem 0;
+        }
+
+        .state-selector label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--primary-blue);
+        }
+
+        .state-selector select {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            border: 2px solid var(--primary-blue);
+            border-radius: 8px;
+            background: var(--white);
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .state-selector select:focus {
+            outline: none;
+            border-color: var(--danger-red);
+        }
+
+        /* State Info Display */
+        .state-info {
+            background: var(--light-gray);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .state-info.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-item {
+            background: var(--white);
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid var(--danger-red);
+        }
+
+        .info-item strong {
+            display: block;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Bar Charts */
+        .chart-container {
+            margin: 2rem 0;
+        }
+
+        .chart-bar {
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .chart-bar-bg {
+            background: var(--light-gray);
+            border-radius: 8px;
+            overflow: hidden;
+            height: 40px;
+            position: relative;
+        }
+
+        .chart-bar-fill {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            color: var(--white);
+            font-weight: bold;
+            transition: width 1s ease;
+            border-radius: 8px;
+        }
+
+        .chart-bar-fill.black { background: linear-gradient(90deg, #dc2626 0%, #b91c1c 100%); }
+        .chart-bar-fill.hispanic { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); }
+        .chart-bar-fill.white { background: linear-gradient(90deg, #10b981 0%, #059669 100%); }
+
+        /* Case Study Cards */
+        .case-studies {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .case-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 5px solid var(--danger-red);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .case-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+
+        .case-card h4 {
+            color: var(--primary-blue);
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        .case-card .demographics {
+            background: var(--light-gray);
+            padding: 0.5rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .case-card .action {
+            color: var(--danger-red);
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+        }
+
+        .case-card .quote {
+            font-style: italic;
+            border-left: 3px solid var(--primary-blue);
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: var(--text-gray);
+        }
+
+        .case-card .impact {
+            background: #fef2f2;
+            padding: 0.75rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            color: var(--danger-red);
+            font-weight: 600;
+        }
+
+        /* Drop Box Comparison */
+        .dropbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .dropbox-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .dropbox-card h4 {
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+
+        .before-after {
+            display: flex;
+            justify-content: space-around;
+            margin: 1rem 0;
+        }
+
+        .before-after div {
+            text-align: center;
+        }
+
+        .before-after .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .before-after .before .number {
+            color: var(--success-green);
+        }
+
+        .before-after .after .number {
+            color: var(--danger-red);
+        }
+
+        .before-after .label {
+            font-size: 0.9rem;
+            color: var(--text-gray);
+        }
+
+        /* Native American Section */
+        .native-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .native-card {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 2px solid var(--warning-orange);
+        }
+
+        .native-card h4 {
+            color: #92400e;
+            margin-bottom: 0.75rem;
+        }
+
+        .distance-highlight {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--danger-red);
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        /* Resources Section */
+        .resources {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .resource-card {
+            background: var(--light-gray);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+        .resource-card:hover {
+            background: #e5e7eb;
+        }
+
+        .resource-card h4 {
+            color: var(--primary-blue);
+            margin-bottom: 0.75rem;
+        }
+
+        .resource-card a {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-blue);
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        .resource-card a:hover {
+            background: #1e40af;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark-bg);
+            color: var(--white);
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 4px solid var(--light-gray);
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Alert Box */
+        .alert {
+            background: #fef2f2;
+            border-left: 5px solid var(--danger-red);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 6px;
+        }
+
+        .alert strong {
+            color: var(--danger-red);
+        }
+
+        /* Toggle Button */
+        .toggle-content {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--light-gray);
+            border-radius: 6px;
+        }
+
+        .toggle-content.active {
+            display: block;
+        }
+
+        .toggle-btn {
+            background: var(--primary-blue);
+            color: var(--white);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .toggle-btn:hover {
+            background: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">⚖️ Ballot Access Explorer</div>
+            <div class="nav-links">
+                <a href="#overview">Overview</a>
+                <a href="#states">States</a>
+                <a href="#wait-times">Wait Times</a>
+                <a href="#case-studies">Cases</a>
+                <a href="#resources">Take Action</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>Ballot Access by ZIP Code</h1>
+            <p>Mapping structural barriers to voting across U.S. counties and ZIP codes. Explore how geography, race, income, and transportation infrastructure create systematic disenfranchisement at the local level.</p>
+        </div>
+
+        <!-- Key Statistics -->
+        <section id="overview">
+            <h2>Key Statistics</h2>
+            <div class="alert">
+                <strong>Critical Finding:</strong> One in five Election Day polling places across the United States has closed over the past decade, with closures accelerating after the 2013 <em>Shelby County v. Holder</em> Supreme Court decision.
+            </div>
+            
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-number">1,688</div>
+                    <div class="stat-label">Polling Places Closed<br>(Section 5 States, 2012-2020)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">20%</div>
+                    <div class="stat-label">Of All Polling Places Closed<br>(Past Decade)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">29%</div>
+                    <div class="stat-label">Longer Wait for<br>Black Voters</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">2.6M</div>
+                    <div class="stat-label">Americans Lack<br>Required Photo ID</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- State Explorer -->
+        <section id="states">
+            <h2>State-by-State Analysis</h2>
+            <p>Select a state to explore detailed information about polling place closures, affected demographics, and key statistics.</p>
+            
+            <div class="state-selector">
+                <label for="stateSelect">Select a State:</label>
+                <select id="stateSelect">
+                    <option value="">-- Choose a State --</option>
+                    <option value="Texas">Texas (750 closures)</option>
+                    <option value="Georgia">Georgia (214 closures)</option>
+                    <option value="Arizona">Arizona (320 closures)</option>
+                    <option value="Louisiana">Louisiana (126 closures)</option>
+                    <option value="Mississippi">Mississippi (78 closures)</option>
+                    <option value="North Carolina">North Carolina (27 closures)</option>
+                    <option value="Alabama">Alabama (72 closures)</option>
+                    <option value="South Carolina">South Carolina (60 closures)</option>
+                    <option value="Virginia">Virginia (38 closures)</option>
+                    <option value="Florida">Florida</option>
+                    <option value="Wisconsin">Wisconsin</option>
+                </select>
+            </div>
+
+            <div id="stateInfo" class="state-info"></div>
+        </section>
+
+        <!-- Wait Times Analysis -->
+        <section id="wait-times">
+            <h2>Racial Disparities in Wait Times</h2>
+            <p>Research using precinct-level data and smartphone location tracking reveals stark racial disparities in how long voters wait to cast ballots.</p>
+            
+            <h3>Average Wait Time by Race (2016-2020)</h3>
+            <div class="chart-container">
+                <div class="chart-bar">
+                    <div class="chart-label">
+                        <span>Black Voters</span>
+                        <span>23.3 minutes</span>
+                    </div>
+                    <div class="chart-bar-bg">
+                        <div class="chart-bar-fill black" style="width: 100%;">23.3 min</div>
+                    </div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">
+                        <span>Hispanic Voters</span>
+                        <span>18.7 minutes</span>
+                    </div>
+                    <div class="chart-bar-bg">
+                        <div class="chart-bar-fill hispanic" style="width: 80%;">18.7 min</div>
+                    </div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">
+                        <span>White Voters</span>
+                        <span>11.6 minutes</span>
+                    </div>
+                    <div class="chart-bar-bg">
+                        <div class="chart-bar-fill white" style="width: 50%;">11.6 min</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Wait Times by Precinct Demographics (2018)</h3>
+            <div class="chart-container">
+                <div class="chart-bar">
+                    <div class="chart-label">
+                        <span>90%+ Non-White Precincts</span>
+                        <span>32.4 minutes</span>
+                    </div>
+                    <div class="chart-bar-bg">
+                        <div class="chart-bar-fill black" style="width: 100%;">32.4 min</div>
+                    </div>
+                </div>
+                <div class="chart-bar">
+                    <div class="chart-label">
+                        <span>≤10% Non-White Precincts</span>
+                        <span>5.1 minutes</span>
+                    </div>
+                    <div class="chart-bar-bg">
+                        <div class="chart-bar-fill white" style="width: 16%;">5.1 min</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert">
+                <strong>Key Finding:</strong> Black voters wait 29% longer to vote and are 74% more likely to spend over 30 minutes at their polling place compared to white voters.
+            </div>
+        </section>
+
+        <!-- Drop Box Restrictions -->
+        <section id="dropbox">
+            <h2>Mail Ballot Drop Box Restrictions</h2>
+            <p>Several states enacted laws severely limiting drop box availability following the 2020 election, with disproportionate impacts on voters of color.</p>
+            
+            <div class="dropbox-grid">
+                <div class="dropbox-card">
+                    <h4>Georgia</h4>
+                    <div class="before-after">
+                        <div class="before">
+                            <div class="number">107</div>
+                            <div class="label">Before</div>
+                        </div>
+                        <div class="after">
+                            <div class="number">25</div>
+                            <div class="label">After</div>
+                        </div>
+                    </div>
+                    <p>Over 50% of state's 550,000 drop box users affected in four Atlanta-area counties</p>
+                </div>
+
+                <div class="dropbox-card">
+                    <h4>Texas</h4>
+                    <p style="font-weight: bold; color: var(--danger-red); margin: 1rem 0;">One drop-off location per county regardless of size</p>
+                    <p><strong>+18 min</strong> travel time by car<br><strong>+32 min</strong> by public transit</p>
+                </div>
+
+                <div class="dropbox-card">
+                    <h4>Florida - Polk County</h4>
+                    <div class="stat-number" style="font-size: 2rem;">88,000</div>
+                    <p>Voters now at least half a mile farther from drop boxes</p>
+                    <p style="margin-top: 1rem;"><strong>13,000+</strong> Latino voters<br><strong>14,500+</strong> Black voters</p>
+                </div>
+
+                <div class="dropbox-card">
+                    <h4>Wisconsin</h4>
+                    <div class="stat-number" style="font-size: 2rem;">63+</div>
+                    <p>Municipalities banned or restricted drop boxes despite 2024 legalization</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Case Studies -->
+        <section id="case-studies">
+            <h2>Case Studies: Local Decisions, Measurable Impact</h2>
+            <p>These real-world examples demonstrate how administrative decisions create measurable disenfranchisement.</p>
+            
+            <div class="case-studies">
+                <div class="case-card">
+                    <h4>Warren County, Georgia</h4>
+                    <div class="demographics">📊 61% Black</div>
+                    <div class="action">⚠️ Closed 5 of 6 polling places</div>
+                    <div class="quote">"71-year-old James Hanson now travels nearly triple the previous distance. Wanda Jenkins drives 12 miles to vote."</div>
+                    <div class="impact">📉 Turnout dropped from 40% (2010) to 35% (2014)</div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;"><em>County officials provided no explanation for the closures.</em></p>
+                </div>
+
+                <div class="case-card">
+                    <h4>Maricopa County, Arizona</h4>
+                    <div class="demographics">📊 31% Latino</div>
+                    <div class="action">⚠️ Reduced from 200 to 60 polling places (2016 primary)</div>
+                    <div class="quote">"One polling place per 21,000 registered voters"</div>
+                    <div class="impact">⏰ Wait times up to 5 hours</div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;"><em>Previously would have required Section 5 preclearance.</em></p>
+                </div>
+
+                <div class="case-card">
+                    <h4>Medina County, Texas - Natalia</h4>
+                    <div class="demographics">📊 75% Latino, only Democratic-leaning area</div>
+                    <div class="action">⚠️ Closed local polling place</div>
+                    <div class="quote">"Elections administrator told activist: 'If you think it's such a big issue, why don't you shuttle them yourself?'"</div>
+                    <div class="impact">🚗 Low-income and disabled Latino voters lost access</div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;"><em>Location eventually restored after local pressure.</em></p>
+                </div>
+
+                <div class="case-card">
+                    <h4>Harris County, Texas</h4>
+                    <div class="demographics">📊 42% Latino, 19% Black</div>
+                    <div class="action">⚠️ Closed 52 polling locations</div>
+                    <div class="quote">"These 50 counties added 2.5 million residents but lost 542 sites"</div>
+                    <div class="impact">📈 Part of 542 closures in 50 highest minority-growth counties</div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;"><em>Counties with low minority growth closed only 34 sites.</em></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Native American Barriers -->
+        <section id="native">
+            <h2>Native American Voters: Extreme Geographic Barriers</h2>
+            <p>Native American voters face some of the most extreme geographic barriers to voting in the nation.</p>
+            
+            <div class="native-grid">
+                <div class="native-card">
+                    <h4>Nevada - Duck Valley Indian Reservation</h4>
+                    <div class="distance-highlight">98 miles</div>
+                    <p>Distance some tribal members must drive to reach a polling location</p>
+                    <p style="margin-top: 1rem;"><strong>8 hours</strong> of early voting over two days</p>
+                </div>
+
+                <div class="native-card">
+                    <h4>Montana - Fort Peck</h4>
+                    <div class="distance-highlight">30-60 miles</div>
+                    <p>Distance tribal members must travel to vote</p>
+                    <p style="margin-top: 1rem;">❌ Denied satellite election office</p>
+                </div>
+
+                <div class="native-card">
+                    <h4>South Dakota</h4>
+                    <div class="distance-highlight">13.4%</div>
+                    <p>Of Native American households lack vehicle access</p>
+                    <p style="margin-top: 1rem;"><strong>32%</strong> say distance to polls affected their voting decision</p>
+                </div>
+            </div>
+
+            <div class="alert" style="margin-top: 2rem;">
+                <strong>Turnout Gap:</strong> Native American voter turnout lags behind the general population by an average of 11 percentage points, reaching 15 points in presidential elections.
+            </div>
+        </section>
+
+        <!-- Data Sources -->
+        <section id="sources">
+            <h2>Data Sources & Research Infrastructure</h2>
+            <button class="toggle-btn" onclick="toggleSources()">Show/Hide Data Sources</button>
+            <div id="sourcesContent" class="toggle-content">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>U.S. Election Assistance Commission</strong>
+                        Biennial Election Administration and Voting Survey (EAVS) with jurisdiction-level data on polling places, wait times, and voting technology.
+                    </div>
+                    <div class="info-item">
+                        <strong>Voting Rights Lab</strong>
+                        Real-time tracker of voting legislation across all 50 states documenting ballot access changes.
+                    </div>
+                    <div class="info-item">
+                        <strong>Brennan Center for Justice</strong>
+                        Comprehensive research on polling place closures and racial turnout gaps using nearly a billion voter records.
+                    </div>
+                    <div class="info-item">
+                        <strong>MIT Election Lab</strong>
+                        Precinct-level databases linking election results to demographic characteristics.
+                    </div>
+                    <div class="info-item">
+                        <strong>Cost of Voting Index</strong>
+                        State rankings based on barriers to registration and ballot casting, updated biennially.
+                    </div>
+                    <div class="info-item">
+                        <strong>Academic Research</strong>
+                        Studies from Stanford, UCLA, and other institutions on wait times, transportation access, and voter behavior.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Take Action -->
+        <section id="resources">
+            <h2>Take Action & Learn More</h2>
+            <p>These resources can help you understand your voting rights, register to vote, and get involved in voting access advocacy.</p>
+            
+            <div class="resources">
+                <div class="resource-card">
+                    <h4>🗳️ Check Your Registration</h4>
+                    <p>Verify your voter registration status and find your polling place.</p>
+                    <a href="https://www.vote.org/" target="_blank" rel="noopener noreferrer">Vote.org</a>
+                </div>
+
+                <div class="resource-card">
+                    <h4>⚖️ Voting Rights Resources</h4>
+                    <p>Learn about your rights and report voting problems.</p>
+                    <a href="https://www.brennancenter.org/" target="_blank" rel="noopener noreferrer">Brennan Center</a>
+                </div>
+
+                <div class="resource-card">
+                    <h4>📊 Election Data</h4>
+                    <p>Access comprehensive election administration data.</p>
+                    <a href="https://electionlab.mit.edu/" target="_blank" rel="noopener noreferrer">MIT Election Lab</a>
+                </div>
+
+                <div class="resource-card">
+                    <h4>🔍 Track Legislation</h4>
+                    <p>Monitor voting legislation in your state.</p>
+                    <a href="https://tracker.votingrightslab.org" target="_blank" rel="noopener noreferrer">Voting Rights Lab</a>
+                </div>
+
+                <div class="resource-card">
+                    <h4>🤝 Get Involved</h4>
+                    <p>Join the fight for voting rights.</p>
+                    <a href="https://www.aclu.org/issues/voting-rights" target="_blank" rel="noopener noreferrer">ACLU</a>
+                </div>
+
+                <div class="resource-card">
+                    <h4>📞 Report Problems</h4>
+                    <p>Call the Election Protection Hotline.</p>
+                    <a href="tel:866-687-8683">1-866-OUR-VOTE</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Ballot Access Explorer | Data from U.S. Election Assistance Commission, Brennan Center, Voting Rights Lab, and academic research institutions</p>
+        <p style="margin-top: 1rem; font-size: 0.9rem;">Created to promote transparency and equitable access to voting for all Americans</p>
+    </footer>
+
+    <script>
+        // State data
+        const stateData = {
+            Texas: {
+                closures: 750,
+                closures_since: 2013,
+                total_counties: 254,
+                affected_counties: ['Harris', 'Dallas', 'Brazoria', 'McLennan'],
+                demographics: 'High Latino and Black population growth areas',
+                key_stat: '5 of 6 counties with most closures nationwide are in Texas'
+            },
+            Georgia: {
+                closures: 214,
+                closures_since: 2013,
+                total_counties: 159,
+                affected_counties: ['Warren', 'Lincoln', 'Clayton', 'Gwinnett'],
+                demographics: 'Majority-Black counties disproportionately affected',
+                key_stat: 'Warren County closed 83% of polling places (6 to 1)'
+            },
+            Arizona: {
+                closures: 320,
+                closures_since: 2012,
+                total_counties: 15,
+                affected_counties: ['Maricopa', 'Pima', 'Cochise', 'Mohave'],
+                demographics: 'High Latino population counties',
+                key_stat: 'Maricopa reduced from 200 to 60 locations in 2016 primary'
+            },
+            Louisiana: {
+                closures: 126,
+                closures_since: 2014,
+                total_counties: 64,
+                affected_counties: [],
+                demographics: 'Post-Shelby closures',
+                key_stat: 'Significant closures in formerly covered jurisdiction'
+            },
+            Mississippi: {
+                closures: 78,
+                closures_since: 2014,
+                total_counties: 82,
+                affected_counties: [],
+                demographics: 'Rural and Black communities affected',
+                key_stat: 'Formerly covered by Section 5 preclearance'
+            },
+            'North Carolina': {
+                closures: 27,
+                closures_since: 2013,
+                total_counties: 100,
+                affected_counties: [],
+                demographics: 'Various demographics',
+                key_stat: "Black voters' mail ballots rejected 1.8x more often"
+            },
+            Alabama: {
+                closures: 72,
+                closures_since: 2013,
+                total_counties: 67,
+                affected_counties: [],
+                demographics: 'Rural Black Belt communities',
+                key_stat: 'Significant DMV closures compound ID requirements'
+            },
+            'South Carolina': {
+                closures: 60,
+                closures_since: 2013,
+                total_counties: 46,
+                affected_counties: [],
+                demographics: 'Rural and coastal communities',
+                key_stat: 'Post-Shelby closures'
+            },
+            Virginia: {
+                closures: 38,
+                closures_since: 2013,
+                total_counties: 95,
+                affected_counties: [],
+                demographics: 'Various demographics',
+                key_stat: 'Has since expanded voting access'
+            },
+            Florida: {
+                closures: 'Data limited',
+                closures_since: 2020,
+                total_counties: 67,
+                affected_counties: ['Polk', 'Manatee'],
+                demographics: 'Black, Latino, and disabled voters',
+                key_stat: '88,000 voters in Polk County now farther from drop boxes'
+            },
+            Wisconsin: {
+                closures: 'Variable by municipality',
+                closures_since: 2022,
+                total_counties: 72,
+                affected_counties: [],
+                demographics: 'Rural communities especially affected',
+                key_stat: '63+ municipalities banned drop boxes despite legalization'
+            }
+        };
+
+        // State selector handler
+        document.getElementById('stateSelect').addEventListener('change', function() {
+            const stateName = this.value;
+            const stateInfoDiv = document.getElementById('stateInfo');
+            
+            if (!stateName) {
+                stateInfoDiv.classList.remove('active');
+                return;
+            }
+
+            const state = stateData[stateName];
+            
+            let html = `
+                <h3>${stateName}</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Polling Place Closures</strong>
+                        ${state.closures} since ${state.closures_since}
+                    </div>
+                    <div class="info-item">
+                        <strong>Total Counties</strong>
+                        ${state.total_counties}
+                    </div>
+                    <div class="info-item">
+                        <strong>Demographics</strong>
+                        ${state.demographics}
+                    </div>
+                </div>
+            `;
+
+            if (state.affected_counties.length > 0) {
+                html += `
+                    <div class="info-item" style="margin-top: 1rem;">
+                        <strong>Most Affected Counties</strong>
+                        ${state.affected_counties.join(', ')}
+                    </div>
+                `;
+            }
+
+            html += `
+                <div class="alert" style="margin-top: 1rem;">
+                    <strong>Key Statistic:</strong> ${state.key_stat}
+                </div>
+            `;
+
+            stateInfoDiv.innerHTML = html;
+            stateInfoDiv.classList.add('active');
+        });
+
+        // Toggle sources
+        function toggleSources() {
+            const content = document.getElementById('sourcesContent');
+            content.classList.toggle('active');
+        }
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Animate charts on scroll
+        const observerOptions = {
+            threshold: 0.3,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+        });
+
+        // Initialize - show first section
+        document.querySelector('section').style.opacity = '1';
+        document.querySelector('section').style.transform = 'translateY(0)';
+    </script>
+</body>
+</html>

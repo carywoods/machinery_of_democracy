@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economics of Political Disinformation - Research Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>Economics of Political Disinformation</h1>
+            <p class="subtitle">An Interactive Research Dashboard</p>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="container">
+            <button class="nav-btn active" data-section="overview">Overview Dashboard</button>
+            <button class="nav-btn" data-section="cases">Case Studies</button>
+            <button class="nav-btn" data-section="monetization">Monetization Models</button>
+            <button class="nav-btn" data-section="regulations">Regulation Tracker</button>
+            <button class="nav-btn" data-section="concepts">Academic Concepts</button>
+            <button class="nav-btn" data-section="stats">Key Statistics</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- Overview Dashboard -->
+        <section id="overview" class="section active">
+            <div class="container">
+                <h2>Overview Dashboard</h2>
+                <p class="section-intro">Global economic landscape of political disinformation - revenue flows, costs, and countermeasures.</p>
+                
+                <div class="filters">
+                    <label class="filter-label">
+                        <span>Filter by Type:</span>
+                        <select id="overview-type-filter" class="form-control">
+                            <option value="all">All Categories</option>
+                        </select>
+                    </label>
+                    <label class="filter-label">
+                        <span>Filter by Year:</span>
+                        <select id="overview-year-filter" class="form-control">
+                            <option value="all">All Years</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div class="chart-grid">
+                    <div class="chart-card">
+                        <h3>Market Data by Category</h3>
+                        <div class="chart-container">
+                            <canvas id="marketChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Revenue vs Economic Cost vs Counter-measures</h3>
+                        <div class="chart-container">
+                            <canvas id="typeComparisonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="overview-cards" class="metric-cards"></div>
+            </div>
+        </section>
+
+        <!-- Case Studies -->
+        <section id="cases" class="section">
+            <div class="container">
+                <h2>Case Studies Explorer</h2>
+                <p class="section-intro">Major economic-motivated misinformation campaigns with detailed revenue models and findings.</p>
+                
+                <div class="filters">
+                    <label class="filter-label">
+                        <span>Sort by:</span>
+                        <select id="case-sort" class="form-control">
+                            <option value="time">Time Period</option>
+                            <option value="motivation">Primary Motivation</option>
+                            <option value="case">Case Name</option>
+                        </select>
+                    </label>
+                    <label class="filter-label">
+                        <span>Filter by Motivation:</span>
+                        <select id="case-filter" class="form-control">
+                            <option value="all">All Motivations</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div id="cases-grid" class="cases-grid"></div>
+            </div>
+        </section>
+
+        <!-- Monetization Models -->
+        <section id="monetization" class="section">
+            <div class="container">
+                <h2>Monetization Models Panel</h2>
+                <p class="section-intro">Key monetization strategies, their prevalence, and platform vulnerabilities.</p>
+                
+                <div class="filters">
+                    <label class="filter-label">
+                        <span>Filter by Vulnerability:</span>
+                        <select id="monetization-filter" class="form-control">
+                            <option value="all">All Levels</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div class="chart-card">
+                    <h3>Platform Vulnerability by Method</h3>
+                    <div class="chart-container">
+                        <canvas id="vulnerabilityChart"></canvas>
+                    </div>
+                </div>
+
+                <div id="monetization-grid" class="monetization-grid"></div>
+            </div>
+        </section>
+
+        <!-- Regulations -->
+        <section id="regulations" class="section">
+            <div class="container">
+                <h2>Regulation Tracker</h2>
+                <p class="section-intro">Major laws, self-policing efforts, and platform policy shifts addressing disinformation economics.</p>
+                
+                <div class="filters">
+                    <label class="filter-label">
+                        <span>Filter by Type:</span>
+                        <select id="regulation-type-filter" class="form-control">
+                            <option value="all">All Types</option>
+                        </select>
+                    </label>
+                    <label class="filter-label">
+                        <span>Filter by Status:</span>
+                        <select id="regulation-status-filter" class="form-control">
+                            <option value="all">All Statuses</option>
+                        </select>
+                    </label>
+                    <label class="filter-label">
+                        <span>Sort by:</span>
+                        <select id="regulation-sort" class="form-control">
+                            <option value="year-desc">Year (Newest)</option>
+                            <option value="year-asc">Year (Oldest)</option>
+                            <option value="name">Name</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div class="chart-card">
+                    <h3>Regulatory Initiatives Timeline</h3>
+                    <div class="chart-container">
+                        <canvas id="regulationTimelineChart"></canvas>
+                    </div>
+                </div>
+
+                <div id="regulations-table" class="regulations-table"></div>
+            </div>
+        </section>
+
+        <!-- Academic Concepts -->
+        <section id="concepts" class="section">
+            <div class="container">
+                <h2>Academic Concepts Library</h2>
+                <p class="section-intro">Core theoretical frameworks explaining the economics of disinformation.</p>
+                
+                <div class="search-box">
+                    <input type="text" id="concept-search" class="form-control" placeholder="Search concepts...">
+                </div>
+
+                <div id="concepts-grid" class="concepts-grid"></div>
+            </div>
+        </section>
+
+        <!-- Key Statistics -->
+        <section id="stats" class="section">
+            <div class="container">
+                <h2>Key Statistics</h2>
+                <p class="section-intro">Headline findings summarizing the economic scale and impact of political disinformation.</p>
+                
+                <div class="search-box">
+                    <input type="text" id="stats-search" class="form-control" placeholder="Search statistics...">
+                </div>
+
+                <div id="stats-grid" class="stats-grid"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Economics of Political Disinformation Research Dashboard</p>
+            <p class="footer-note">All data sourced from academic research, regulatory reports, and industry analysis.</p>
+        </div>
+    </footer>
+
+    <!-- Modal for detailed views -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

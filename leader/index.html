@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Political Leadership Predictor</title>
+    <style>
+        :root {
+            --color-white: rgba(255, 255, 255, 1);
+            --color-black: rgba(0, 0, 0, 1);
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-gray-400: rgba(119, 124, 124, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-300: rgba(50, 184, 198, 1);
+            --color-teal-400: rgba(45, 166, 178, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-teal-700: rgba(26, 104, 115, 1);
+            --color-brown-600-rgb: 94, 82, 64;
+            --color-teal-500-rgb: 33, 128, 141;
+            --color-slate-900-rgb: 19, 52, 59;
+            --color-slate-500-rgb: 98, 108, 113;
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-primary-active: var(--color-teal-700);
+            --color-secondary: rgba(var(--color-brown-600-rgb), 0.12);
+            --color-secondary-hover: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-btn-primary-text: var(--color-cream-50);
+            --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-size-sm: 12px;
+            --font-size-base: 14px;
+            --font-size-lg: 16px;
+            --font-size-xl: 18px;
+            --font-size-2xl: 20px;
+            --font-size-3xl: 24px;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 550;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --space-32: 32px;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-gray-400-rgb: 119, 124, 124;
+                --color-teal-300-rgb: 50, 184, 198;
+                --color-gray-300-rgb: 167, 169, 169;
+                --color-gray-200-rgb: 245, 245, 245;
+                --color-background: var(--color-charcoal-700);
+                --color-surface: var(--color-charcoal-800);
+                --color-text: var(--color-gray-200);
+                --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
+                --color-primary: var(--color-teal-300);
+                --color-primary-hover: var(--color-teal-400);
+                --color-secondary: rgba(var(--color-gray-400-rgb), 0.15);
+                --color-secondary-hover: rgba(var(--color-gray-400-rgb), 0.25);
+                --color-border: rgba(var(--color-gray-400-rgb), 0.3);
+                --color-btn-primary-text: var(--color-slate-900);
+                --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background: var(--color-background);
+            color: var(--color-text);
+            padding: var(--space-24);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: var(--space-32);
+        }
+
+        h1 {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-12);
+            color: var(--color-text);
+        }
+
+        .subtitle {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .assessment-form {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-card-border);
+            padding: var(--space-24);
+            margin-bottom: var(--space-24);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .category {
+            margin-bottom: var(--space-32);
+        }
+
+        .category:last-child {
+            margin-bottom: 0;
+        }
+
+        .category-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-16);
+            color: var(--color-primary);
+        }
+
+        .question {
+            margin-bottom: var(--space-24);
+        }
+
+        .question-label {
+            display: block;
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            margin-bottom: var(--space-12);
+            color: var(--color-text);
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: var(--space-16);
+        }
+
+        .slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--color-secondary);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            cursor: pointer;
+            border: none;
+            transition: transform 0.15s;
+        }
+
+        .slider::-moz-range-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .slider-value {
+            min-width: 40px;
+            text-align: center;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-primary);
+            font-size: var(--font-size-lg);
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: var(--space-8);
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: var(--space-12) var(--space-32);
+            border-radius: var(--radius-base);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: var(--color-btn-primary-text);
+            width: 100%;
+            font-size: var(--font-size-lg);
+            padding: var(--space-16);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .btn-primary:active {
+            background: var(--color-primary-active);
+        }
+
+        .results {
+            display: none;
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-card-border);
+            padding: var(--space-32);
+            box-shadow: var(--shadow-md);
+        }
+
+        .results.visible {
+            display: block;
+        }
+
+        .results-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-24);
+            text-align: center;
+            color: var(--color-text);
+        }
+
+        .score-display {
+            text-align: center;
+            margin-bottom: var(--space-32);
+        }
+
+        .score-number {
+            font-size: 64px;
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-primary);
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+            margin-top: var(--space-8);
+        }
+
+        .breakdown {
+            margin-bottom: var(--space-32);
+        }
+
+        .breakdown-item {
+            margin-bottom: var(--space-16);
+        }
+
+        .breakdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-8);
+        }
+
+        .breakdown-name {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text);
+        }
+
+        .breakdown-score {
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-primary);
+        }
+
+        .breakdown-bar {
+            height: 8px;
+            background: var(--color-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .breakdown-fill {
+            height: 100%;
+            background: var(--color-primary);
+            transition: width 0.5s ease-out;
+        }
+
+        .insights {
+            background: var(--color-secondary);
+            padding: var(--space-20);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-24);
+        }
+
+        .insights-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-12);
+            color: var(--color-text);
+        }
+
+        .insights-text {
+            font-size: var(--font-size-base);
+            color: var(--color-text);
+            line-height: 1.7;
+        }
+
+        .recommendations {
+            margin-top: var(--space-24);
+        }
+
+        .recommendations-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-16);
+            color: var(--color-text);
+        }
+
+        .recommendation-item {
+            background: var(--color-secondary);
+            padding: var(--space-16);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-12);
+        }
+
+        .recommendation-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .recommendation-title {
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-primary);
+            margin-bottom: var(--space-8);
+        }
+
+        .recommendation-text {
+            font-size: var(--font-size-base);
+            color: var(--color-text);
+        }
+
+        .historical-comparisons {
+            margin-top: var(--space-32);
+            padding-top: var(--space-32);
+            border-top: 1px solid var(--color-border);
+        }
+
+        .comparison-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-16);
+            color: var(--color-text);
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-16);
+        }
+
+        .comparison-card {
+            background: var(--color-secondary);
+            padding: var(--space-16);
+            border-radius: var(--radius-base);
+        }
+
+        .comparison-name {
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-lg);
+            margin-bottom: var(--space-8);
+            color: var(--color-text);
+        }
+
+        .comparison-match {
+            font-size: var(--font-size-sm);
+            color: var(--color-primary);
+            margin-bottom: var(--space-8);
+        }
+
+        .comparison-desc {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: var(--space-16);
+            }
+
+            .assessment-form {
+                padding: var(--space-16);
+            }
+
+            .results {
+                padding: var(--space-20);
+            }
+
+            .score-number {
+                font-size: 48px;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Political Leadership Predictor</h1>
+            <p class="subtitle">Assess your potential for political leadership emergence based on research-backed indicators including education, activism, narrative skill, coalition-building, and digital platform fluency.</p>
+        </header>
+
+        <form id="assessmentForm" class="assessment-form">
+            <div class="category">
+                <h2 class="category-title">Foundational Attributes</h2>
+                
+                <div class="question">
+                    <label class="question-label">Conscientiousness &amp; Organization</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="conscientiousness" data-category="attributes">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Emotional Stability &amp; Resilience</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="emotional" data-category="attributes">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Extraversion &amp; Social Energy</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="extraversion" data-category="attributes">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Political Skill &amp; Social Astuteness</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="political_skill" data-category="attributes">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category">
+                <h2 class="category-title">Educational Background</h2>
+                
+                <div class="question">
+                    <label class="question-label">Level of Education Attained</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="education_level" data-category="education">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>High School</span>
+                        <span>Advanced Degree</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Relevance to Governance (Social Sciences, Law, Economics)</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="field_relevance" data-category="education">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Unrelated</span>
+                        <span>Highly Relevant</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Network Access from Educational Institutions</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="edu_networks" data-category="education">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Limited</span>
+                        <span>Extensive</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category">
+                <h2 class="category-title">Activism &amp; Community Organizing</h2>
+                
+                <div class="question">
+                    <label class="question-label">Community Organizing Experience</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="organizing" data-category="activism">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>None</span>
+                        <span>Extensive</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Participation in Social Movements</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="movements" data-category="activism">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>None</span>
+                        <span>Extensive</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Campaign Volunteer Experience</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="campaigns" data-category="activism">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>None</span>
+                        <span>Extensive</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Local Issue Identification &amp; Mobilization</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="mobilization" data-category="activism">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category">
+                <h2 class="category-title">Narrative Skill &amp; Storytelling</h2>
+                
+                <div class="question">
+                    <label class="question-label">Personal Story of Self (Origin Story)</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="story_self" data-category="narrative">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Unclear</span>
+                        <span>Compelling</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Story of Us (Uniting Constituencies)</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="story_us" data-category="narrative">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Weak</span>
+                        <span>Strong</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Story of Now (Creating Urgency)</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="story_now" data-category="narrative">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Weak</span>
+                        <span>Strong</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Authenticity &amp; Vulnerability</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="authenticity" data-category="narrative">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category">
+                <h2 class="category-title">Coalition-Building Capacity</h2>
+                
+                <div class="question">
+                    <label class="question-label">Finding Common Cause Across Differences</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="common_cause" data-category="coalition">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Weak</span>
+                        <span>Strong</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Building Diverse, Multiracial Coalitions</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="diverse_coalition" data-category="coalition">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Weak</span>
+                        <span>Strong</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Balancing Stakeholder Interests</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="stakeholder" data-category="coalition">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Weak</span>
+                        <span>Strong</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Willingness to Pursue Incremental Progress</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="incremental" data-category="coalition">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Low</span>
+                        <span>High</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category">
+                <h2 class="category-title">Digital Platform Fluency</h2>
+                
+                <div class="question">
+                    <label class="question-label">Social Media Strategy &amp; Content Optimization</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="social_media" data-category="digital">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Weak</span>
+                        <span>Strong</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Ability to Inspire User-Generated Content</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="ugc" data-category="digital">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Weak</span>
+                        <span>Strong</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Multimodal Communication (Video, Audio, Text)</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="multimodal" data-category="digital">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Limited</span>
+                        <span>Extensive</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Authentic Online-to-Offline Translation</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="online_offline" data-category="digital">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>Weak</span>
+                        <span>Strong</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category">
+                <h2 class="category-title">Institutional Connections</h2>
+                
+                <div class="question">
+                    <label class="question-label">Candidate Recruitment Organization Relationships</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="recruitment" data-category="institutional">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>None</span>
+                        <span>Strong</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Mentorship from Established Political Figures</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="mentorship" data-category="institutional">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>None</span>
+                        <span>Strong</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Access to Campaign Consultants &amp; Operatives</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="consultants" data-category="institutional">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>None</span>
+                        <span>Strong</span>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">Foundation/Nonprofit Leadership Experience</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="nonprofit" data-category="institutional">
+                        <span class="slider-value">5</span>
+                    </div>
+                    <div class="slider-labels">
+                        <span>None</span>
+                        <span>Extensive</span>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Calculate Leadership Potential</button>
+        </form>
+
+        <div id="results" class="results">
+            <h2 class="results-title">Your Leadership Emergence Score</h2>
+            
+            <div class="score-display">
+                <div class="score-number" id="totalScore">0</div>
+                <div class="score-label">out of 100</div>
+            </div>
+
+            <div class="breakdown" id="breakdown"></div>
+
+            <div class="insights">
+                <h3 class="insights-title">Key Insights</h3>
+                <p class="insights-text" id="insightsText"></p>
+            </div>
+
+            <div class="recommendations">
+                <h3 class="recommendations-title">Development Recommendations</h3>
+                <div id="recommendationsList"></div>
+            </div>
+
+            <div class="historical-comparisons">
+                <h3 class="comparison-title">Historical Leader Comparisons</h3>
+                <div class="comparison-grid" id="comparisons"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize slider value displays
+        const sliders = document.querySelectorAll('.slider');
+        sliders.forEach(slider => {
+            const valueDisplay = slider.parentElement.querySelector('.slider-value');
+            slider.addEventListener('input', (e) => {
+                valueDisplay.textContent = e.target.value;
+            });
+        });
+
+        // Form submission
+        document.getElementById('assessmentForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            calculateResults();
+        });
+
+        function calculateResults() {
+            const categories = {
+                attributes: ['conscientiousness', 'emotional', 'extraversion', 'political_skill'],
+                education: ['education_level', 'field_relevance', 'edu_networks'],
+                activism: ['organizing', 'movements', 'campaigns', 'mobilization'],
+                narrative: ['story_self', 'story_us', 'story_now', 'authenticity'],
+                coalition: ['common_cause', 'diverse_coalition', 'stakeholder', 'incremental'],
+                digital: ['social_media', 'ugc', 'multimodal', 'online_offline'],
+                institutional: ['recruitment', 'mentorship', 'consultants', 'nonprofit']
+            };
+
+            const categoryWeights = {
+                attributes: 0.15,
+                education: 0.12,
+                activism: 0.18,
+                narrative: 0.16,
+                coalition: 0.16,
+                digital: 0.13,
+                institutional: 0.10
+            };
+
+            const categoryNames = {
+                attributes: 'Foundational Attributes',
+                education: 'Educational Background',
+                activism: 'Activism & Organizing',
+                narrative: 'Narrative Skill',
+                coalition: 'Coalition-Building',
+                digital: 'Digital Fluency',
+                institutional: 'Institutional Connections'
+            };
+
+            let categoryScores = {};
+            let totalScore = 0;
+
+            // Calculate category scores
+            for (let [category, fields] of Object.entries(categories)) {
+                let sum = 0;
+                fields.forEach(field => {
+                    const value = parseInt(document.getElementById(field).value);
+                    sum += value;
+                });
+                const avgScore = (sum / fields.length) * 10;
+                categoryScores[category] = Math.round(avgScore);
+                totalScore += avgScore * categoryWeights[category];
+            }
+
+            totalScore = Math.round(totalScore);
+
+            // Display results
+            document.getElementById('totalScore').textContent = totalScore;
+
+            // Display breakdown
+            const breakdownHTML = Object.entries(categoryScores).map(([category, score]) => {
+                return `
+                    <div class="breakdown-item">
+                        <div class="breakdown-header">
+                            <span class="breakdown-name">${categoryNames[category]}</span>
+                            <span class="breakdown-score">${score}/100</span>
+                        </div>
+                        <div class="breakdown-bar">
+                            <div class="breakdown-fill" style="width: ${score}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('breakdown').innerHTML = breakdownHTML;
+
+            // Generate insights
+            const insights = generateInsights(totalScore, categoryScores);
+            document.getElementById('insightsText').textContent = insights;
+
+            // Generate recommendations
+            const recommendations = generateRecommendations(categoryScores);
+            const recommendationsHTML = recommendations.map(rec => {
+                return `
+                    <div class="recommendation-item">
+                        <div class="recommendation-title">${rec.title}</div>
+                        <div class="recommendation-text">${rec.text}</div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('recommendationsList').innerHTML = recommendationsHTML;
+
+            // Generate historical comparisons
+            const comparisons = generateComparisons(totalScore, categoryScores);
+            const comparisonsHTML = comparisons.map(comp => {
+                return `
+                    <div class="comparison-card">
+                        <div class="comparison-name">${comp.name}</div>
+                        <div class="comparison-match">${comp.match}% Match</div>
+                        <div class="comparison-desc">${comp.description}</div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('comparisons').innerHTML = comparisonsHTML;
+
+            // Show results
+            document.getElementById('results').classList.add('visible');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generateInsights(totalScore, categoryScores) {
+            if (totalScore >= 80) {
+                return "Your profile demonstrates exceptional leadership emergence potential across multiple dimensions. You possess the foundational attributes, experience, and skills that characterize successful political leaders who achieve national recognition. Your strongest assets are complemented by solid performance in other critical areas, positioning you well for rapid political advancement.";
+            } else if (totalScore >= 65) {
+                return "You show strong leadership emergence potential with notable strengths in several key areas. While you have solid foundations for political leadership, targeted development in specific dimensions could significantly accelerate your trajectory. Focus on transforming your strongest assets into distinctive advantages while building competency in areas showing lower scores.";
+            } else if (totalScore >= 50) {
+                return "You demonstrate moderate leadership potential with a mixed profile of strengths and development areas. Your foundation exists but requires strategic enhancement across multiple dimensions. Consider focusing on 2-3 specific areas where targeted effort could produce meaningful gains, particularly in activism experience, narrative skill, or coalition-building capacity.";
+            } else {
+                return "Your leadership profile shows emerging potential that would benefit from foundational development across key dimensions. Consider starting with community organizing or campaign volunteer experience to build practical skills while developing your personal narrative. Many successful political leaders began from similar starting points through strategic skill development and network building.";
+            }
+        }
+
+        function generateRecommendations(categoryScores) {
+            const recommendations = [];
+            const sortedCategories = Object.entries(categoryScores).sort((a, b) => a[1] - b[1]);
+
+            // Get lowest three categories
+            const weakest = sortedCategories.slice(0, 3);
+
+            const recMap = {
+                attributes: {
+                    title: "Develop Self-Leadership & Political Skill",
+                    text: "Focus on building emotional resilience through challenging experiences. Practice active listening and reading social dynamics in group settings. Develop your ability to influence without authority through volunteer coordination roles."
+                },
+                education: {
+                    title: "Enhance Educational Credentials & Networks",
+                    text: "Consider enrolling in policy-focused certificate programs at institutions like Harvard Kennedy School or similar programs. Join alumni networks and professional associations in governance-related fields. Prioritize learning that develops ideological frameworks for policy reform."
+                },
+                activism: {
+                    title: "Build Community Organizing Experience",
+                    text: "Volunteer with local campaigns or community organizations. Participate in grassroots movements aligned with your values. Work on voter registration drives or issue-based advocacy. Progress from participation to coordination to leadership roles over 12-18 months."
+                },
+                narrative: {
+                    title: "Strengthen Your Public Narrative",
+                    text: "Develop your 'story of self' by identifying formative experiences that shaped your values. Practice Marshall Ganz's public narrative framework. Share personal stories with vulnerability. Work with communication coaches or join Toastmasters to refine delivery."
+                },
+                coalition: {
+                    title: "Practice Coalition-Building Skills",
+                    text: "Lead cross-functional projects that require stakeholder coordination. Practice finding 'common cause' with people holding different viewpoints. Study successful coalition case studies. Volunteer for organizations that unite diverse constituencies around shared goals."
+                },
+                digital: {
+                    title: "Develop Digital Platform Mastery",
+                    text: "Create consistent content across platforms demonstrating your authentic voice. Study viral political content to understand algorithmic dynamics. Experiment with video, audio, and text formats. Focus on inspiring supporter-generated content rather than broadcasting. Ensure digital presence connects to real-world organizing."
+                },
+                institutional: {
+                    title: "Build Institutional Connections",
+                    text: "Apply to candidate recruitment programs like Run for Something, EMILY's List, or Justice Democrats. Seek mentorship from elected officials or political operatives. Join campaign strategy workshops and political training programs. Serve on nonprofit boards to build institutional credibility."
+                }
+            };
+
+            weakest.forEach(([category, score]) => {
+                if (recMap[category]) {
+                    recommendations.push(recMap[category]);
+                }
+            });
+
+            return recommendations;
+        }
+
+        function generateComparisons(totalScore, categoryScores) {
+            const leaders = [
+                {
+                    name: "Barack Obama",
+                    profile: { education: 95, narrative: 90, coalition: 95, institutional: 85, activism: 80, attributes: 85, digital: 60 },
+                    description: "Elite educational credentials (Harvard Law), exceptional narrative skill (2004 DNC speech), masterful coalition-building across racial lines, strong community organizing foundation."
+                },
+                {
+                    name: "Alexandria Ocasio-Cortez",
+                    profile: { activism: 95, narrative: 90, digital: 95, coalition: 80, attributes: 85, education: 70, institutional: 60 },
+                    description: "Grassroots organizing excellence, compelling personal narrative, digital platform mastery, strong activist credentials, less reliant on institutional connections."
+                },
+                {
+                    name: "Pete Buttigieg",
+                    profile: { education: 95, narrative: 88, attributes: 85, coalition: 82, institutional: 80, digital: 75, activism: 65 },
+                    description: "Rhodes Scholar credentials, public narrative framework expertise, intellectual sophistication, executive experience, strategic communication skills."
+                },
+                {
+                    name: "Stacey Abrams",
+                    profile: { coalition: 95, institutional: 90, education: 90, narrative: 85, activism: 80, attributes: 85, digital: 75 },
+                    description: "Exceptional coalition-building across differences, strong institutional networks, elite education (Yale Law), entrepreneurial leadership, nonprofit experience."
+                },
+                {
+                    name: "Zohran Mamdani",
+                    profile: { digital: 98, activism: 92, narrative: 88, coalition: 85, attributes: 82, education: 70, institutional: 65 },
+                    description: "Revolutionary digital platform mastery, authentic activist credentials (hunger strike), compelling affordability narrative, rapid emergence through social media."
+                }
+            ];
+
+            // Calculate match percentages
+            const matches = leaders.map(leader => {
+                let matchScore = 0;
+                let count = 0;
+                Object.entries(leader.profile).forEach(([category, leaderScore]) => {
+                    if (categoryScores[category]) {
+                        const diff = Math.abs(leaderScore - categoryScores[category]);
+                        matchScore += Math.max(0, 100 - diff);
+                        count++;
+                    }
+                });
+                const match = Math.round(matchScore / count);
+                return { ...leader, match };
+            });
+
+            // Sort by match and return top 3
+            return matches.sort((a, b) => b.match - a.match).slice(0, 3);
+        }
+    </script>
+</body>
+</html>

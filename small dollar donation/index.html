@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign Finance Tracker - Small-Dollar Fundraising Evolution</title>
+    <style>
+        :root {
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-brown-600-rgb: 94, 82, 64;
+            --color-teal-500-rgb: 33, 128, 141;
+            
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+            
+            --color-actblue: #0066CC;
+            --color-winred: #CC0000;
+            --color-small-donor: #2E7D32;
+            
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --space-32: 32px;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-charcoal-700: rgba(31, 33, 33, 1);
+                --color-charcoal-800: rgba(38, 40, 40, 1);
+                --color-gray-300-rgb: 167, 169, 169;
+                --color-teal-300: rgba(50, 184, 198, 1);
+                --color-gray-400-rgb: 119, 124, 124;
+                
+                --color-background: var(--color-charcoal-700);
+                --color-surface: var(--color-charcoal-800);
+                --color-text: var(--color-gray-200);
+                --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
+                --color-primary: var(--color-teal-300);
+                --color-border: rgba(var(--color-gray-400-rgb), 0.3);
+                --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+            padding: var(--space-20);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: var(--space-32);
+            padding-bottom: var(--space-24);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: var(--space-12);
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: var(--color-text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-16);
+            margin-bottom: var(--space-32);
+        }
+
+        .metric-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-20);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-8);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .metric-change {
+            font-size: 0.85rem;
+            margin-top: var(--space-8);
+            color: var(--color-text-secondary);
+        }
+
+        .controls {
+            display: flex;
+            gap: var(--space-16);
+            margin-bottom: var(--space-24);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: var(--space-8) var(--space-16);
+            border-radius: var(--radius-base);
+            border: 1px solid var(--color-border);
+            background: var(--color-surface);
+            color: var(--color-text);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .btn.active {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .chart-container {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-24);
+            margin-bottom: var(--space-24);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: var(--space-20);
+        }
+
+        #mainChart {
+            width: 100%;
+            height: 400px;
+            position: relative;
+        }
+
+        .data-table {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: var(--space-12) var(--space-16);
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        th {
+            background: rgba(var(--color-teal-500-rgb), 0.1);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: rgba(var(--color-teal-500-rgb), 0.05);
+        }
+
+        .legend {
+            display: flex;
+            gap: var(--space-20);
+            justify-content: center;
+            margin-top: var(--space-20);
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-8);
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: var(--space-12);
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #mainChart {
+                height: 300px;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: var(--space-8) var(--space-12);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Campaign Finance Tracker</h1>
+            <p class="subtitle">Small-Dollar Fundraising Evolution (2010-2024)</p>
+        </header>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Small Donor Share</div>
+                <div class="metric-value" id="smallDonorMetric">25%</div>
+                <div class="metric-change">2024</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">ActBlue Total (2024)</div>
+                <div class="metric-value" id="actblueMetric">$4.3B</div>
+                <div class="metric-change">+95% vs 2022</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">WinRed Total (2024)</div>
+                <div class="metric-value" id="winredMetric">$2.1B</div>
+                <div class="metric-change">+110% vs 2022</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Growth Since 2010</div>
+                <div class="metric-value" id="growthMetric">+32%</div>
+                <div class="metric-change">Small donor share increase</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn active" data-view="all">All Metrics</button>
+            <button class="btn" data-view="platforms">Platform Comparison</button>
+            <button class="btn" data-view="donors">Small Donor Share</button>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title" id="chartTitle">Campaign Finance Evolution (2010-2024)</div>
+            <canvas id="mainChart"></canvas>
+            <div class="legend" id="chartLegend"></div>
+        </div>
+
+        <div class="data-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Small Donor %</th>
+                        <th>ActBlue ($B)</th>
+                        <th>WinRed ($B)</th>
+                        <th>Key Events</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const data = [
+            {year: 2010, smallDonor: 19, actblue: null, winred: null, events: 'Tea Party movement energizes small donors'},
+            {year: 2012, smallDonor: 18, actblue: 0.329, winred: null, events: 'Obama re-election; ActBlue processes $329M (2012-14 cycle)'},
+            {year: 2014, smallDonor: 17, actblue: 0.329, winred: null, events: 'Republican wave election'},
+            {year: 2016, smallDonor: 23.97, actblue: 0.8, winred: null, events: 'Bernie Sanders revolution; Trump small-donor surge'},
+            {year: 2018, smallDonor: 24, actblue: 1.6, winred: null, events: 'Blue Wave; Democratic House takeover; $1.6B via ActBlue'},
+            {year: 2020, smallDonor: 23.97, actblue: 4.8, winred: 1.2, events: 'George Floyd protests; RBG death; $4.8B via ActBlue; WinRed launches'},
+            {year: 2022, smallDonor: 24, actblue: 2.2, winred: 1.0, events: 'Dobbs decision spurs record ActBlue day ($20.6M)'},
+            {year: 2024, smallDonor: 25, actblue: 4.3, winred: 2.1, events: 'Harris campaign raises $81M in 24 hours via ActBlue'}
+        ];
+
+        let currentView = 'all';
+        let chart = null;
+
+        function initChart() {
+            const canvas = document.getElementById('mainChart');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            drawChart(ctx);
+        }
+
+        function drawChart(ctx) {
+            const canvas = ctx.canvas;
+            const width = canvas.width;
+            const height = canvas.height;
+            const padding = 60;
+            const chartWidth = width - padding * 2;
+            const chartHeight = height - padding * 2;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const years = data.map(d => d.year);
+            const xStep = chartWidth / (years.length - 1);
+
+            if (currentView === 'all' || currentView === 'donors') {
+                drawSmallDonorLine(ctx, padding, chartWidth, chartHeight);
+            }
+            
+            if (currentView === 'all' || currentView === 'platforms') {
+                drawPlatformBars(ctx, padding, chartWidth, chartHeight, xStep);
+            }
+
+            drawAxes(ctx, padding, width, height, chartWidth, chartHeight);
+            updateLegend();
+        }
+
+        function drawSmallDonorLine(ctx, padding, chartWidth, chartHeight) {
+            const maxSmallDonor = Math.max(...data.map(d => d.smallDonor));
+            const yScale = chartHeight / maxSmallDonor;
+            const xStep = chartWidth / (data.length - 1);
+
+            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-small-donor') || '#2E7D32';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+
+            data.forEach((d, i) => {
+                const x = padding + i * xStep;
+                const y = padding + chartHeight - (d.smallDonor * yScale);
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+
+            ctx.stroke();
+
+            ctx.fillStyle = ctx.strokeStyle;
+            data.forEach((d, i) => {
+                const x = padding + i * xStep;
+                const y = padding + chartHeight - (d.smallDonor * yScale);
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function drawPlatformBars(ctx, padding, chartWidth, chartHeight, xStep) {
+            const maxPlatform = Math.max(...data.map(d => Math.max(d.actblue || 0, d.winred || 0)));
+            const yScale = chartHeight / (maxPlatform * 1.1);
+            const barWidth = xStep * 0.3;
+
+            data.forEach((d, i) => {
+                const x = padding + i * xStep;
+
+                if (d.actblue !== null) {
+                    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-actblue') || '#0066CC';
+                    const barHeight = d.actblue * yScale;
+                    ctx.fillRect(x - barWidth, padding + chartHeight - barHeight, barWidth * 0.9, barHeight);
+                }
+
+                if (d.winred !== null) {
+                    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-winred') || '#CC0000';
+                    const barHeight = d.winred * yScale;
+                    ctx.fillRect(x + barWidth * 0.1, padding + chartHeight - barHeight, barWidth * 0.9, barHeight);
+                }
+            });
+        }
+
+        function drawAxes(ctx, padding, width, height, chartWidth, chartHeight) {
+            const textColor = getComputedStyle(document.documentElement).getPropertyValue('--color-text') || '#000';
+            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-border') || '#ccc';
+            ctx.fillStyle = textColor;
+            ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, padding + chartHeight);
+            ctx.lineTo(padding + chartWidth, padding + chartHeight);
+            ctx.stroke();
+
+            const xStep = chartWidth / (data.length - 1);
+            data.forEach((d, i) => {
+                const x = padding + i * xStep;
+                ctx.fillText(d.year, x - 15, padding + chartHeight + 20);
+            });
+
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + chartHeight - (i * chartHeight / 5);
+                ctx.fillText(Math.round(i * 5), padding - 10, y + 4);
+            }
+        }
+
+        function updateLegend() {
+            const legend = document.getElementById('chartLegend');
+            legend.innerHTML = '';
+
+            if (currentView === 'all' || currentView === 'donors') {
+                legend.innerHTML += `
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--color-small-donor)"></div>
+                        <span>Small Donor Share (%)</span>
+                    </div>
+                `;
+            }
+
+            if (currentView === 'all' || currentView === 'platforms') {
+                legend.innerHTML += `
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--color-actblue)"></div>
+                        <span>ActBlue ($B)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--color-winred)"></div>
+                        <span>WinRed ($B)</span>
+                    </div>
+                `;
+            }
+        }
+
+        function populateTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = data.map(d => `
+                <tr>
+                    <td><strong>${d.year}</strong></td>
+                    <td>${d.smallDonor}%</td>
+                    <td>${d.actblue !== null ? '$' + d.actblue.toFixed(2) + 'B' : '—'}</td>
+                    <td>${d.winred !== null ? '$' + d.winred.toFixed(2) + 'B' : '—'}</td>
+                    <td>${d.events}</td>
+                </tr>
+            `).join('');
+        }
+
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentView = btn.dataset.view;
+                
+                const titles = {
+                    all: 'Campaign Finance Evolution (2010-2024)',
+                    platforms: 'Platform Fundraising Comparison',
+                    donors: 'Small Donor Share Trend'
+                };
+                
+                document.getElementById('chartTitle').textContent = titles[currentView];
+                
+                const canvas = document.getElementById('mainChart');
+                const ctx = canvas.getContext('2d');
+                drawChart(ctx);
+            });
+        });
+
+        window.addEventListener('resize', () => {
+            initChart();
+        });
+
+        populateTable();
+        initChart();
+    </script>
+</body>
+</html>

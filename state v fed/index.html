@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>State Legislature Policy Tracker</title>
+    <style>
+        :root {
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-300: rgba(50, 184, 198, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-teal-700: rgba(26, 104, 115, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-brown-600-rgb: 94, 82, 64;
+            --color-teal-500-rgb: 33, 128, 141;
+            --color-slate-900-rgb: 19, 52, 59;
+            --color-bg-1: rgba(59, 130, 246, 0.08);
+            --color-bg-2: rgba(245, 158, 11, 0.08);
+            --color-bg-3: rgba(34, 197, 94, 0.08);
+            --color-bg-4: rgba(239, 68, 68, 0.08);
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --space-32: 32px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-background: var(--color-charcoal-700);
+                --color-surface: var(--color-charcoal-800);
+                --color-text: var(--color-gray-200);
+                --color-text-secondary: rgba(var(--color-gray-300), 0.7);
+                --color-primary: var(--color-teal-300);
+                --color-border: rgba(119, 124, 124, 0.3);
+                --color-card-border: rgba(119, 124, 124, 0.2);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-background);
+            color: var(--color-text);
+            padding: var(--space-24);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: var(--space-32);
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: var(--space-8);
+            color: var(--color-text);
+        }
+
+        .subtitle {
+            color: var(--color-text-secondary);
+            font-size: 16px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: var(--space-8);
+            margin-bottom: var(--space-24);
+            border-bottom: 2px solid var(--color-border);
+            padding-bottom: 0;
+        }
+
+        .tab {
+            background: none;
+            border: none;
+            padding: var(--space-12) var(--space-20);
+            font-size: 15px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: var(--color-text);
+        }
+
+        .tab.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-16);
+            margin-bottom: var(--space-32);
+        }
+
+        .stat-card {
+            background: var(--color-surface);
+            padding: var(--space-20);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-card-border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-8);
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: var(--space-8);
+        }
+
+        .stat-detail {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+        }
+
+        .comparison-section {
+            background: var(--color-surface);
+            padding: var(--space-24);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-card-border);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-24);
+        }
+
+        .comparison-section h2 {
+            font-size: 20px;
+            margin-bottom: var(--space-20);
+            color: var(--color-text);
+        }
+
+        .comparison-bars {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-20);
+        }
+
+        .comparison-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-8);
+        }
+
+        .comparison-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .bar-container {
+            height: 32px;
+            background: var(--color-bg-1);
+            border-radius: var(--radius-base);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: var(--color-primary);
+            border-radius: var(--radius-base);
+            transition: width 0.6s ease-out;
+            display: flex;
+            align-items: center;
+            padding: 0 var(--space-12);
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .policy-section {
+            background: var(--color-surface);
+            padding: var(--space-24);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--color-card-border);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--space-16);
+        }
+
+        .policy-section h3 {
+            font-size: 18px;
+            margin-bottom: var(--space-16);
+            color: var(--color-text);
+        }
+
+        .policy-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-12);
+            background: var(--color-bg-2);
+            border-radius: var(--radius-base);
+            margin-bottom: var(--space-8);
+        }
+
+        .policy-stat-label {
+            font-size: 14px;
+            color: var(--color-text);
+        }
+
+        .policy-stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .insights-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-12);
+        }
+
+        .insight-item {
+            background: var(--color-bg-3);
+            padding: var(--space-16);
+            border-radius: var(--radius-base);
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .insight-title {
+            font-weight: 600;
+            margin-bottom: var(--space-8);
+            color: var(--color-text);
+        }
+
+        .insight-text {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--space-16);
+        }
+
+        th {
+            text-align: left;
+            padding: var(--space-12);
+            background: var(--color-bg-1);
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--color-text);
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        td {
+            padding: var(--space-12);
+            border-bottom: 1px solid var(--color-border);
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: var(--color-bg-1);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: var(--space-16);
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>State Legislature Policy Tracker</h1>
+            <p class="subtitle">Analyzing the shift of policymaking power from federal to state legislatures</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="overview">Overview</button>
+            <button class="tab" data-tab="comparison">State vs Federal</button>
+            <button class="tab" data-tab="policies">Policy Areas</button>
+            <button class="tab" data-tab="insights">Key Insights</button>
+        </div>
+
+        <div id="overview" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">State Bills Introduced (2025)</div>
+                    <div class="stat-value">135,500</div>
+                    <div class="stat-detail">13.6x more than federal</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">State Bills Enacted (2025)</div>
+                    <div class="stat-value">29,000</div>
+                    <div class="stat-detail">28% passage rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Federal Bills Introduced (2025)</div>
+                    <div class="stat-value">~10,000</div>
+                    <div class="stat-detail">2.3% passage rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Productivity Gap</div>
+                    <div class="stat-value">12.2x</div>
+                    <div class="stat-detail">States are 12x more productive</div>
+                </div>
+            </div>
+
+            <div class="comparison-section">
+                <h2>Legislative Activity Trends (2020-2025)</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Year</th>
+                            <th>Bills Introduced</th>
+                            <th>Bills Enacted</th>
+                            <th>Passage Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2020</td>
+                            <td>73,250</td>
+                            <td>—</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>2021</td>
+                            <td>117,188</td>
+                            <td>—</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td>2022</td>
+                            <td>75,675</td>
+                            <td>14,088</td>
+                            <td>18.6%</td>
+                        </tr>
+                        <tr>
+                            <td>2023</td>
+                            <td>121,537</td>
+                            <td>—</td>
+                            <td>28.0%</td>
+                        </tr>
+                        <tr>
+                            <td>2024</td>
+                            <td>76,756</td>
+                            <td>14,088</td>
+                            <td>18.4%</td>
+                        </tr>
+                        <tr style="background: var(--color-bg-2);">
+                            <td><strong>2025</strong></td>
+                            <td><strong>135,500</strong></td>
+                            <td><strong>29,000</strong></td>
+                            <td><strong>28.0%</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="comparison" class="tab-content">
+            <div class="comparison-section">
+                <h2>State vs Federal Legislative Productivity</h2>
+                <div class="comparison-bars">
+                    <div class="comparison-item">
+                        <div class="comparison-label">
+                            <span>Bills Introduced</span>
+                            <span>135,500 vs 10,000</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 93%;">States: 93%</div>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 7%; background: var(--color-slate-500);">Federal: 7%</div>
+                        </div>
+                    </div>
+
+                    <div class="comparison-item">
+                        <div class="comparison-label">
+                            <span>Passage Rate</span>
+                            <span>28% vs 2.3%</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 92%;">States: 28%</div>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 8%; background: var(--color-slate-500);">Federal: 2.3%</div>
+                        </div>
+                    </div>
+
+                    <div class="comparison-item">
+                        <div class="comparison-label">
+                            <span>Bills Enacted (2025)</span>
+                            <span>29,000 vs ~230</span>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 99%;">States: 29,000</div>
+                        </div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width: 1%; background: var(--color-slate-500);">Federal: ~230</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="insights-list">
+                <div class="insight-item">
+                    <div class="insight-title">Volume Disparity</div>
+                    <div class="insight-text">State legislatures introduce 13.6 times more bills than Congress, demonstrating their central role in American policymaking.</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-title">Effectiveness Gap</div>
+                    <div class="insight-text">States pass bills at a rate 12.2 times higher than the federal government, showing dramatically higher legislative productivity.</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-title">Federal Gridlock</div>
+                    <div class="insight-text">The 118th Congress became one of the least productive sessions in modern history, passing only 34 bills by January 2024.</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="policies" class="tab-content">
+            <div class="policy-section">
+                <h3>Voting Rights (2025)</h3>
+                <div class="policy-stat">
+                    <span class="policy-stat-label">Restrictive bills considered</span>
+                    <span class="policy-stat-value">469</span>
+                </div>
+                <div class="policy-stat">
+                    <span class="policy-stat-label">Restrictive laws enacted</span>
+                    <span class="policy-stat-value">29</span>
+                </div>
+                <div class="policy-stat">
+                    <span class="policy-stat-label">States with restrictive laws</span>
+                    <span class="policy-stat-value">16</span>
+                </div>
+                <div class="policy-stat">
+                    <span class="policy-stat-label">Expansive laws enacted</span>
+                    <span class="policy-stat-value">30</span>
+                </div>
+                <div class="policy-stat">
+                    <span class="policy-stat-label">States with expansive laws</span>
+                    <span class="policy-stat-value">25</span>
+                </div>
+            </div>
+
+            <div class="policy-section">
+                <h3>Abortion Policy</h3>
+                <div class="policy-stat">
+                    <span class="policy-stat-label">Bills enacted since Roe v. Wade (1973)</span>
+                    <span class="policy-stat-value">1,000+</span>
+                </div>
+                <div class="policy-stat">
+                    <span class="policy-stat-label">Average bills per year (2010-2021)</span>
+                    <span class="policy-stat-value">54</span>
+                </div>
+                <div class="policy-stat">
+                    <span class="policy-stat-label">States with complete bans</span>
+                    <span class="policy-stat-value">13</span>
+                </div>
+                <div class="policy-stat">
+                    <span class="policy-stat-label">States with personhood bills (2025)</span>
+                    <span class="policy-stat-value">8</span>
+                </div>
+            </div>
+
+            <div class="policy-section">
+                <h3>Gun Control & Safety (2025)</h3>
+                <div class="policy-stat">
+                    <span class="policy-stat-label">State funding for violence intervention</span>
+                    <span class="policy-stat-value">$47M+</span>
+                </div>
+                <div class="policy-stat">
+                    <span class="policy-stat-label">States with assault rifle bans</span>
+                    <span class="policy-stat-value">11</span>
+                </div>
+                <div class="policy-stat">
+                    <span class="policy-stat-label">States with permitless carry</span>
+                    <span class="policy-stat-value">25+</span>
+                </div>
+            </div>
+
+            <div class="policy-section">
+                <h3>Education & School Choice (2025)</h3>
+                <div class="policy-stat">
+                    <span class="policy-stat-label">States with school choice bills</span>
+                    <span class="policy-stat-value">30</span>
+                </div>
+                <div class="policy-stat">
+                    <span class="policy-stat-label">Total bills introduced</span>
+                    <span class="policy-stat-value">114</span>
+                </div>
+                <div class="policy-stat">
+                    <span class="policy-stat-label">States with universal ESA/voucher programs</span>
+                    <span class="policy-stat-value">12</span>
+                </div>
+                <div class="policy-stat">
+                    <span class="policy-stat-label">Texas ESA funding</span>
+                    <span class="policy-stat-value">$1B</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="insights" class="tab-content">
+            <div class="insights-list">
+                <div class="insight-item">
+                    <div class="insight-title">Model Legislation Dominance</div>
+                    <div class="insight-text">ALEC introduced 2,900+ model bills between 2010-2018, with over 600 becoming law. ALEC model bills pass at rates nearly 5x higher than average congressional legislation.</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-title">Funding Shift to States</div>
+                    <div class="insight-text">Democratic groups planned $175M for 2024 state legislative races. Republicans maintained structural advantages despite being outspent 4-to-1, controlling 57 of 98 partisan chambers.</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-title">Accountability Crisis</div>
+                    <div class="insight-text">90% of voters cannot identify their state legislator. Full-time statehouse reporters declined 6% from 2014-2022, falling from 904 to 850 nationally.</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-title">Democratic Backsliding</div>
+                    <div class="insight-text">Political scientist Jake Grumbach warns that nationalization of state politics creates "laboratories against democracy" where national groups use state authority to suppress votes and gerrymander districts.</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-title">Policy Laboratory Variation</div>
+                    <div class="insight-text">Red and blue states implement increasingly distinct agendas in healthcare, reproductive rights, and climate. This creates "variable citizenship" where fundamental rights depend on state residence.</div>
+                </div>
+                <div class="insight-item">
+                    <div class="insight-title">Single-Party Trifecta Efficiency</div>
+                    <div class="insight-text">States with single-party control show exceptional productivity. Colorado achieved 73.5% passage rate with unified Democratic control, while Texas passed 35.5% of 9,120 introduced bills.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.getAttribute('data-tab');
+                
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+
+        // Animate bars on page load
+        window.addEventListener('load', () => {
+            const bars = document.querySelectorAll('.bar-fill');
+            bars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

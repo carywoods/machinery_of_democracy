@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Machinery of Democracy - Interactive Companion</title>
+    <link rel="stylesheet" href="css/shared.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Main Header -->
+        <header class="main-header">
+            <div class="header-content">
+                <h1 class="main-title">The Machinery of Democracy</h1>
+                <p class="main-subtitle">An interactive companion to understanding American electoral infrastructure</p>
+            </div>
+        </header>
+
+        <!-- Chapter Navigation -->
+        <nav class="chapter-nav">
+            <div class="chapter-nav-inner">
+                <button class="chapter-button active" data-chapter="ballot-access">
+                    <span class="chapter-number">1.</span> Ballot Access
+                </button>
+                <button class="chapter-button" data-chapter="ballot-measures">
+                    <span class="chapter-number">2.</span> Ballot Measures
+                </button>
+                <button class="chapter-button" data-chapter="deepfake">
+                    <span class="chapter-number">3.</span> Deepfakes
+                </button>
+                <button class="chapter-button" data-chapter="disinformation">
+                    <span class="chapter-number">4.</span> Disinformation
+                </button>
+                <button class="chapter-button" data-chapter="gerrymandering">
+                    <span class="chapter-number">5.</span> Gerrymandering
+                </button>
+                <button class="chapter-button" data-chapter="leaders">
+                    <span class="chapter-number">6.</span> Political Leaders
+                </button>
+                <button class="chapter-button" data-chapter="donations">
+                    <span class="chapter-number">7.</span> Small Dollar Donations
+                </button>
+                <button class="chapter-button" data-chapter="state-federal">
+                    <span class="chapter-number">8.</span> State vs Federal
+                </button>
+                <button class="chapter-button" data-chapter="turnover">
+                    <span class="chapter-number">9.</span> Election Turnover
+                </button>
+                <button class="chapter-button" data-chapter="voting-machines">
+                    <span class="chapter-number">10.</span> Voting Machines
+                </button>
+                <button class="chapter-button" data-chapter="rebuilding">
+                    <span class="chapter-number">11.</span> Rebuilding
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Chapter content will be dynamically inserted here -->
+            <div id="chapter-container"></div>
+        </main>
+    </div>
+
+    <!-- Main Application Controller -->
+    <script src="app.js"></script>
+
+    <!-- Chapter Modules (loaded dynamically) -->
+    <script src="chapters/chapter1-ballot-access.js"></script>
+    <script src="chapters/chapter2-ballot-measures.js"></script>
+    <script src="chapters/chapter3-deepfake.js"></script>
+    <script src="chapters/chapter4-disinformation.js"></script>
+    <script src="chapters/chapter5-gerrymandering.js"></script>
+    <script src="chapters/chapter6-leaders.js"></script>
+    <script src="chapters/chapter7-donations.js"></script>
+    <script src="chapters/chapter8-state-federal.js"></script>
+    <script src="chapters/chapter9-turnover.js"></script>
+    <script src="chapters/chapter10-voting-machines.js"></script>
+    <script src="chapters/chapter11-rebuilding.js"></script>
+
+    <!-- Chart.js for data visualization (used by some chapters) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>

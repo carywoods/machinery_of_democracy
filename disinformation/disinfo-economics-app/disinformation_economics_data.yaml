@@ -1,0 +1,273 @@
+market_data:
+  Category:
+  - Global ad spend on misinformation
+  - US ad spend on misinformation
+  - Top 40 election disinfo sites revenue
+  - Annual global economic cost
+  - Annual stock market losses (US)
+  - Content detection market (2024)
+  - Content detection forecast (2030)
+  - Fake image detection (2023)
+  - Fake image detection forecast (2029)
+  Amount_Billions:
+  - 2.6
+  - 1.62
+  - 0.0427
+  - 78
+  - 39
+  - 17.35
+  - 38.9
+  - 1.81
+  - 4.21
+  Year:
+  - 2022
+  - 2022
+  - 2022
+  - 2019
+  - 2019
+  - 2024
+  - 2030
+  - 2023
+  - 2029
+  Source:
+  - NewsGuard/Comscore
+  - NewsGuard/Comscore
+  - Carter Center
+  - Univ. Baltimore/CHEQ
+  - Univ. Baltimore/CHEQ
+  - Grand View Research
+  - Grand View Research
+  - Markets & Markets
+  - Markets & Markets
+  Type:
+  - Revenue
+  - Revenue
+  - Revenue
+  - Economic Cost
+  - Economic Cost
+  - Counter-measure Market
+  - Counter-measure Market
+  - Counter-measure Market
+  - Counter-measure Market
+case_studies:
+  Case:
+  - Veles, Macedonia (2016)
+  - Internet Research Agency (2016)
+  - Cambridge Analytica
+  - YouTube Conspiracy Channels
+  - Anti-Vaccine Influencers
+  - QAnon Merchandise Networks
+  - COVID-19 Misinformation
+  Time_Period:
+  - '2016'
+  - 2016-Present
+  - 2014-2018
+  - 2020-2022
+  - 2020-2023
+  - 2020-2023
+  - 2020-2023
+  Primary_Motivation:
+  - Economic
+  - State-sponsored + Economic
+  - Commercial/Political
+  - Economic
+  - Economic
+  - Economic
+  - Economic
+  Revenue_Model:
+  - Google AdSense from viral content
+  - State funding + advertising revenue
+  - Political campaign contracts
+  - YouTube ads + alternative monetization
+  - Subscriptions + affiliate marketing
+  - Merchandise + platform ads
+  - Product sales + subscriptions
+  Revenue_Estimate:
+  - $60K-$1M+ per individual
+  - $1.25M+ monthly budget
+  - $5.8M+ (Cruz campaign alone)
+  - 11x higher predatory ads
+  - $75-$850/year subscriptions
+  - Multiple revenue streams
+  - 25%+ follower growth
+  Key_Finding:
+  - Teenagers earned more than doctors; purely profit-driven
+  - 400 employees working 12-hour shifts
+  - Harvested 87M Facebook profiles for targeting
+  - 53% of demonetized channels use alternative sites
+  - MLM products and alternative health supplements
+  - Vietnam-based commercial operations
+  - Pandemic created unprecedented monetization opportunity
+monetization_methods:
+  Method:
+  - Programmatic Advertising
+  - Affiliate Marketing
+  - Merchandise Sales
+  - Subscription Services
+  - Crowdfunding/Donations
+  - Influencer Sponsorships
+  - Click Farms
+  - Bot Networks
+  - Political Contracts
+  - MLM Products
+  Description:
+  - Automated ad placement on content sites via Google AdSense, Facebook Audience
+    Network
+  - Commissions from product sales via Amazon Associates, health supplements, survival
+    gear
+  - Direct sales of branded merchandise (QAnon, political merchandise)
+  - Premium content access, newsletters, exclusive communities
+  - Patreon, GoFundMe, PayPal donations from dedicated followers
+  - Paid posts from campaigns, Super PACs, political organizations
+  - Artificial traffic generation to boost ad revenue
+  - Amplification services sold to boost engagement metrics
+  - Direct payments from political campaigns for services
+  - Multi-level marketing health products, essential oils
+  Prevalence_Metric:
+  - 81.47% of disinfo traffic monetizable
+  - 95% of low-quality marketers use it
+  - Common on conspiracy channels
+  - Premium anti-vax model
+  - 2.3x more on conspiracy vs mainstream
+  - Growing 25%+ follower growth
+  - Widespread for traffic generation
+  - Bot farms charge $0.15/upvote
+  - Multi-million dollar contracts
+  - Major revenue for wellness influencers
+  Platform_Vulnerability:
+  - High - opacity enables abuse
+  - High - difficult to trace
+  - Medium - easy to identify
+  - Low - direct relationship
+  - Low - direct relationship
+  - Medium - disclosure requirements weak
+  - High - detection challenges
+  - High - sophisticated evasion
+  - Low - legitimate transactions
+  - Medium - operates outside platforms
+regulations:
+  Initiative:
+  - EU Digital Services Act
+  - EU Code of Practice on Disinformation
+  - Brand Safety Verification (IAS, DoubleVerify)
+  - YouTube Demonetization Policies
+  - Facebook/Meta Fact-Checking
+  - Meta Fact-Checking Rollback
+  - YouTube Policy Reversals
+  - Twitter/X Community Notes
+  Year_Implemented:
+  - 2024
+  - 2022
+  - 2018
+  - 2020
+  - 2016
+  - 2025
+  - 2025
+  - 2023
+  Type:
+  - Government Regulation
+  - Self-Regulation
+  - Industry Tool
+  - Platform Policy
+  - Platform Policy
+  - Deregulation
+  - Deregulation
+  - Self-Regulation
+  Jurisdiction:
+  - EU
+  - EU
+  - Global
+  - Global
+  - Global
+  - Global
+  - Global
+  - Global
+  Status:
+  - Active
+  - Active but gaps
+  - Active
+  - Active but weakening
+  - Discontinued
+  - Active
+  - Active
+  - Active
+  Effectiveness_Rating:
+  - Under evaluation
+  - Limited - 81% disinfo still monetized
+  - Limited - $2.6B still flows to misinfo
+  - Limited - 53% use alternative methods
+  - Moderate effectiveness reported
+  - Concerns of increased misinformation
+  - Concerns of increased misinformation
+  - Mixed results, scale challenges
+key_stats:
+  Statistic:
+  - Global ad revenue to misinformation
+  - US ad revenue to misinformation
+  - Percentage of disinfo traffic monetizable
+  - Ratio of disinfo ad spend vs total digital news ad revenue
+  - Conspiracy channels using alternative monetization
+  - Predatory ads on conspiracy vs mainstream
+  - Anti-vax influencer follower growth during COVID
+  - Misinformation spread speed vs truth
+  - Increase in hate speech on X after moderation rollback
+  - Monthly budget of Internet Research Agency
+  - Macedonian teenager earnings (6 months)
+  - Content detection market CAGR
+  - Global economic cost of fake news annually
+  Value:
+  - $2.6 billion
+  - $1.62 billion
+  - 81.47%
+  - 46% (nearly half)
+  - 2.3x more likely
+  - 11x higher
+  - 25%+ growth
+  - 70% faster
+  - 50% increase
+  - $1.25 million
+  - $60,000-$1,000,000
+  - 14.5%
+  - $78 billion
+  Source:
+  - NewsGuard/Comscore 2022
+  - NewsGuard/Comscore 2022
+  - Carter Center 2024
+  - NewsGuard analysis
+  - NYU research 2022
+  - NYU research 2022
+  - CCDH 2021
+  - Academic research
+  - Research post-Musk takeover
+  - Mueller indictment 2018
+  - Field research 2016
+  - Grand View Research
+  - Univ. Baltimore/CHEQ 2019
+academic_frameworks:
+  Concept:
+  - Attention Economy
+  - Information Pollution
+  - Algorithmic Amplification
+  - Filter Bubbles
+  - Pigouvian Taxation
+  - Behavioral Economics
+  - Market-Shaping
+  - Platform Capitalism
+  Description:
+  - Attention as scarce economic resource competed for by platforms
+  - Misinformation as negative externality similar to environmental pollution
+  - Engagement algorithms systematically favor viral/emotional content
+  - Echo chambers created when platforms maximize ad revenue through engagement
+  - Proposed taxes on misinformation to internalize social costs
+  - Cognitive biases interact with platform design to spread falsehoods
+  - Platforms actively shape markets for information goods
+  - Revenue optimization creates incentives for harmful content
+  Key_Finding:
+  - Users allocate attention in fixed patterns regardless of content quality
+  - Social costs exceed private costs, creating market failure
+  - Low-reliability content shared less but compensated by algorithmic echo chambers
+  - Platforms limit viral content spread only when it threatens revenue
+  - Economic incentives could align platform behavior with social good
+  - Misinformation spreads 70% faster due to novelty and emotional triggers
+  - Multiple market actors financially benefit from disinformation spread
+  - Engagement-based models create expected, not accidental, misinformation spread

@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Democracy Maintenance App</title>
+    <style>
+        :root {
+            --color-green: #21808d;
+            --color-yellow: #e68161;
+            --color-red: #c0152f;
+            --color-bg: #fcfcf9;
+            --color-surface: #fffffe;
+            --color-text: #133c3b;
+            --color-text-secondary: #626c71;
+            --color-border: rgba(94, 82, 64, 0.2);
+            --color-card-border: rgba(94, 82, 64, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Splash Screen */
+        .splash {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .splash h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--color-text);
+        }
+
+        .splash p {
+            font-size: 1.2rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 28px;
+            background: var(--color-green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #29747e;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(94, 82, 64, 0.12);
+            color: var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(94, 82, 64, 0.2);
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .header h2 {
+            font-size: 1.8rem;
+        }
+
+        .back-btn {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        /* Profile Selector */
+        .profile-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .profile-btn {
+            flex: 1;
+            min-width: 180px;
+            padding: 12px;
+            background: var(--color-surface);
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .profile-btn:hover {
+            border-color: var(--color-green);
+        }
+
+        .profile-btn.active {
+            background: var(--color-green);
+            color: white;
+            border-color: var(--color-green);
+        }
+
+        /* Tiles Grid */
+        .tiles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .tile {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .tile:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .tile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .tile h3 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-badge.green {
+            background: rgba(33, 128, 141, 0.15);
+            color: var(--color-green);
+        }
+
+        .status-badge.yellow {
+            background: rgba(230, 129, 97, 0.15);
+            color: var(--color-yellow);
+        }
+
+        .status-badge.red {
+            background: rgba(192, 21, 47, 0.15);
+            color: var(--color-red);
+        }
+
+        .tile p {
+            color: var(--color-text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: var(--color-text);
+        }
+
+        .tab.active {
+            color: var(--color-green);
+            border-bottom-color: var(--color-green);
+        }
+
+        /* Checklist */
+        .checklist {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .checklist h4 {
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: var(--color-bg);
+            border-radius: 6px;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            margin-top: 4px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checklist-item label {
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .status-message {
+            background: rgba(33, 128, 141, 0.08);
+            border-left: 4px solid var(--color-green);
+            padding: 16px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 0.95rem;
+        }
+
+        .status-message.warning {
+            background: rgba(230, 129, 97, 0.08);
+            border-left-color: var(--color-yellow);
+        }
+
+        .status-message.danger {
+            background: rgba(192, 21, 47, 0.08);
+            border-left-color: var(--color-red);
+        }
+
+        /* Progress bars */
+        .progress-section {
+            margin-top: 40px;
+        }
+
+        .progress-item {
+            margin-bottom: 20px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: rgba(94, 82, 64, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--color-green);
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.yellow {
+            background: var(--color-yellow);
+        }
+
+        .progress-fill.red {
+            background: var(--color-red);
+        }
+
+        /* Final screen */
+        .final-message {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .final-message blockquote {
+            font-size: 1.2rem;
+            color: var(--color-text-secondary);
+            margin: 20px 0;
+            font-style: italic;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        @media (max-width: 640px) {
+            .tiles {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-selector {
+                flex-direction: column;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Splash Screen -->
+        <div id="splash" class="screen active">
+            <div class="splash">
+                <h1>Democracy Maintenance App</h1>
+                <p>Is your machinery running on improvisation or design?</p>
+                <button class="btn" onclick="showScreen('home')">Launch Assessment</button>
+            </div>
+        </div>
+
+        <!-- Home Screen -->
+        <div id="home" class="screen">
+            <div class="header">
+                <h2>Democracy Maintenance</h2>
+            </div>
+
+            <div class="profile-selector">
+                <button class="profile-btn active" data-profile="admin">Election Administrator</button>
+                <button class="profile-btn" data-profile="legislator">Legislator / Policy Staff</button>
+                <button class="profile-btn" data-profile="society">Civil Society / Media</button>
+            </div>
+
+            <div class="tiles">
+                <div class="tile" onclick="showScreen('foundations')">
+                    <div class="tile-header">
+                        <h3>Foundations</h3>
+                        <span class="status-badge" id="foundations-badge">Red</span>
+                    </div>
+                    <p>How you cast and count.</p>
+                </div>
+
+                <div class="tile" onclick="showScreen('defense')">
+                    <div class="tile-header">
+                        <h3>Defense</h3>
+                        <span class="status-badge" id="defense-badge">Red</span>
+                    </div>
+                    <p>How you protect and verify.</p>
+                </div>
+
+                <div class="tile" onclick="showScreen('sustainability')">
+                    <div class="tile-header">
+                        <h3>Sustainability</h3>
+                        <span class="status-badge" id="sustainability-badge">Red</span>
+                    </div>
+                    <p>How you fund and replace.</p>
+                </div>
+
+                <div class="tile" onclick="showScreen('people')">
+                    <div class="tile-header">
+                        <h3>People</h3>
+                        <span class="status-badge" id="people-badge">Red</span>
+                    </div>
+                    <p>Who keeps it running.</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px; text-align: center;">
+                <button class="btn" onclick="showScreen('final')">View Overall Status</button>
+            </div>
+        </div>
+
+        <!-- Foundations Screen -->
+        <div id="foundations" class="screen">
+            <div class="header">
+                <h2>Foundations</h2>
+                <button class="btn btn-secondary back-btn" onclick="showScreen('home')">← Back</button>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('foundations', 'short')">Next Election</button>
+                <button class="tab" onclick="switchTab('foundations', 'medium')">Next Cycles</button>
+                <button class="tab" onclick="switchTab('foundations', 'long')">2030+</button>
+            </div>
+
+            <div id="foundations-short" class="tab-content">
+                <div class="checklist">
+                    <h4>Short Term Actions</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="f-s-1" onchange="updateProgress()">
+                        <label for="f-s-1">All polling-place systems produce voter-verifiable paper ballots</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="f-s-2" onchange="updateProgress()">
+                        <label for="f-s-2">Post-election audit scheduled for every major contest</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="f-s-3" onchange="updateProgress()">
+                        <label for="f-s-3">Pre-election logic and accuracy testing is observable and documented</label>
+                    </div>
+                </div>
+                <div class="status-message danger">
+                    <strong>Critical:</strong> Paper and audits are non-negotiable redundancy for failing machinery.
+                </div>
+            </div>
+
+            <div id="foundations-medium" class="tab-content" style="display:none;">
+                <div class="checklist">
+                    <h4>Medium Term Actions</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="f-m-1" onchange="updateProgress()">
+                        <label for="f-m-1">Risk-limiting audits (RLAs) piloted in at least one jurisdiction</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="f-m-2" onchange="updateProgress()">
+                        <label for="f-m-2">State-level rules requiring routine post-election audits</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="f-m-3" onchange="updateProgress()">
+                        <label for="f-m-3">Audit procedures allow public and partisan observation</label>
+                    </div>
+                </div>
+                <div class="status-message">
+                    You are either confirming outcomes mathematically or hoping you are right.
+                </div>
+            </div>
+
+            <div id="foundations-long" class="tab-content" style="display:none;">
+                <div class="checklist">
+                    <h4>Long Term Goals</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="f-l-1" onchange="updateProgress()">
+                        <label for="f-l-1">RLAs or equivalent robust audits are mandatory statewide</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="f-l-2" onchange="updateProgress()">
+                        <label for="f-l-2">Audit timelines are integrated into certification law</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="f-l-3" onchange="updateProgress()">
+                        <label for="f-l-3">Citizens can understand and observe core counting steps without expert knowledge</label>
+                    </div>
+                </div>
+                <div class="status-message">
+                    <strong>Green status:</strong> Citizens can see and verify how votes become results.
+                </div>
+            </div>
+        </div>
+
+        <!-- Defense Screen -->
+        <div id="defense" class="screen">
+            <div class="header">
+                <h2>Defense</h2>
+                <button class="btn btn-secondary back-btn" onclick="showScreen('home')">← Back</button>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('defense', 'short')">Next Election</button>
+                <button class="tab" onclick="switchTab('defense', 'medium')">Next Cycles</button>
+                <button class="tab" onclick="switchTab('defense', 'long')">2030+</button>
+            </div>
+
+            <div id="defense-short" class="tab-content">
+                <div class="checklist">
+                    <h4>Short Term Actions</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="d-s-1" onchange="updateProgress()">
+                        <label for="d-s-1">No voting machines transmit results via cellular modems or public networks</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="d-s-2" onchange="updateProgress()">
+                        <label for="d-s-2">Bipartisan teams handle all equipment and media</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="d-s-3" onchange="updateProgress()">
+                        <label for="d-s-3">Tamper-evident seals with logged serial numbers on all devices</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="d-s-4" onchange="updateProgress()">
+                        <label for="d-s-4">Named point person and partner outlet for rapid debunking of synthetic media</label>
+                    </div>
+                </div>
+                <div class="status-message danger">
+                    If one person with a USB stick or a deepfake can change the story, you're exposed.
+                </div>
+            </div>
+
+            <div id="defense-medium" class="tab-content" style="display:none;">
+                <div class="checklist">
+                    <h4>Medium Term Actions</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="d-m-1" onchange="updateProgress()">
+                        <label for="d-m-1">Regular penetration testing of voting, registration, and reporting systems</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="d-m-2" onchange="updateProgress()">
+                        <label for="d-m-2">State rules banning modems and defining acceptable connectivity</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="d-m-3" onchange="updateProgress()">
+                        <label for="d-m-3">Participation in a threat-sharing network (regional ISAC or equivalent)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="d-m-4" onchange="updateProgress()">
+                        <label for="d-m-4">Playbooks for election-period synthetic media attacks, including local races</label>
+                    </div>
+                </div>
+                <div class="status-message">
+                    Defense shifts from reacting to intrusions to hunting for vulnerabilities before they are exploited.
+                </div>
+            </div>
+
+            <div id="defense-long" class="tab-content" style="display:none;">
+                <div class="checklist">
+                    <h4>Long Term Goals</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="d-l-1" onchange="updateProgress()">
+                        <label for="d-l-1">Pen-testing, vulnerability disclosure, and red-team exercises institutionalized in law</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="d-l-2" onchange="updateProgress()">
+                        <label for="d-l-2">Standing verification infrastructure (forensics, legal tools, media partners) at state level</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="d-l-3" onchange="updateProgress()">
+                        <label for="d-l-3">Federal coordination is funded, staffed, and insulated from partisan cycles</label>
+                    </div>
+                </div>
+                <div class="status-message">
+                    <strong>Green status:</strong> Defense is a permanent function, not a temporary grant.
+                </div>
+            </div>
+        </div>
+
+        <!-- Sustainability Screen -->
+        <div id="sustainability" class="screen">
+            <div class="header">
+                <h2>Sustainability</h2>
+                <button class="btn btn-secondary back-btn" onclick="showScreen('home')">← Back</button>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('sustainability', 'short')">Next Election</button>
+                <button class="tab" onclick="switchTab('sustainability', 'medium')">Next Cycles</button>
+                <button class="tab" onclick="switchTab('sustainability', 'long')">2030+</button>
+            </div>
+
+            <div id="sustainability-short" class="tab-content">
+                <div class="checklist">
+                    <h4>Short Term Actions</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="su-s-1" onchange="updateProgress()">
+                        <label for="su-s-1">Inventory of all equipment with in-service dates and vendor support status</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="su-s-2" onchange="updateProgress()">
+                        <label for="su-s-2">One-cycle survival plan for any system older than 10 years or no longer manufactured</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="su-s-3" onchange="updateProgress()">
+                        <label for="su-s-3">Emergency reserve for critical repairs in the coming year</label>
+                    </div>
+                </div>
+                <div class="status-message warning">
+                    Know exactly what is likely to fail and how you will limp through one more cycle.
+                </div>
+            </div>
+
+            <div id="sustainability-medium" class="tab-content" style="display:none;">
+                <div class="checklist">
+                    <h4>Medium Term Actions</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="su-m-1" onchange="updateProgress()">
+                        <label for="su-m-1">Statutory or formal policy setting 8-10 year replacement cycles for core equipment</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="su-m-2" onchange="updateProgress()">
+                        <label for="su-m-2">Dedicated revenue source or sinking fund (state or county) for replacements</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="su-m-3" onchange="updateProgress()">
+                        <label for="su-m-3">Centralized or coordinated procurement to guarantee support and parts</label>
+                    </div>
+                </div>
+                <div class="status-message">
+                    You are moving from panic purchases to planned upgrades.
+                </div>
+            </div>
+
+            <div id="sustainability-long" class="tab-content" style="display:none;">
+                <div class="checklist">
+                    <h4>Long Term Goals</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="su-l-1" onchange="updateProgress()">
+                        <label for="su-l-1">Replacement cycles codified and funded beyond single appropriations fights</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="su-l-2" onchange="updateProgress()">
+                        <label for="su-l-2">EAC- or state-level technical standards tied to lifecycle planning and vendor obligations</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="su-l-3" onchange="updateProgress()">
+                        <label for="su-l-3">Small and rural jurisdictions receive equal-quality equipment and support</label>
+                    </div>
+                </div>
+                <div class="status-message">
+                    <strong>Green status:</strong> Aging machines are a choice, not a fate.
+                </div>
+            </div>
+        </div>
+
+        <!-- People Screen -->
+        <div id="people" class="screen">
+            <div class="header">
+                <h2>People</h2>
+                <button class="btn btn-secondary back-btn" onclick="showScreen('home')">← Back</button>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('people', 'short')">Next Election</button>
+                <button class="tab" onclick="switchTab('people', 'medium')">Next Cycles</button>
+                <button class="tab" onclick="switchTab('people', 'long')">2030+</button>
+            </div>
+
+            <div id="people-short" class="tab-content">
+                <div class="checklist">
+                    <h4>Short Term Actions</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p-s-1" onchange="updateProgress()">
+                        <label for="p-s-1">Core staff retained through next election; succession risks identified</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p-s-2" onchange="updateProgress()">
+                        <label for="p-s-2">Minimum training hours for poll workers and staff defined and scheduled</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p-s-3" onchange="updateProgress()">
+                        <label for="p-s-3">Formal policy and contact path for reporting threats; coordination with law enforcement</label>
+                    </div>
+                </div>
+                <div class="status-message danger">
+                    If one departure or one threat can topple your operation, the machinery is brittle.
+                </div>
+            </div>
+
+            <div id="people-medium" class="tab-content" style="display:none;">
+                <div class="checklist">
+                    <h4>Medium Term Actions</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p-m-1" onchange="updateProgress()">
+                        <label for="p-m-1">Multi-year staffing plan with target headcounts and experience mix</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p-m-2" onchange="updateProgress()">
+                        <label for="p-m-2">Raise or stabilize compensation to competitive public-service levels</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p-m-3" onchange="updateProgress()">
+                        <label for="p-m-3">Dedicated budget for training (procedures, law, technology, communication)</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p-m-4" onchange="updateProgress()">
+                        <label for="p-m-4">Psychological and legal support structures for officials facing harassment</label>
+                    </div>
+                </div>
+                <div class="status-message">
+                    You are treating election administration as a skilled profession, not a temp job.
+                </div>
+            </div>
+
+            <div id="people-long" class="tab-content" style="display:none;">
+                <div class="checklist">
+                    <h4>Long Term Goals</h4>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p-l-1" onchange="updateProgress()">
+                        <label for="p-l-1">Election administration reclassified as a protected civil service career</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p-l-2" onchange="updateProgress()">
+                        <label for="p-l-2">Formal barriers to partisan interference in hiring, firing, and certification decisions</label>
+                    </div>
+                    <div class="checklist-item">
+                        <input type="checkbox" id="p-l-3" onchange="updateProgress()">
+                        <label for="p-l-3">National or state training academies creating a pipeline of professional administrators</label>
+                    </div>
+                </div>
+                <div class="status-message">
+                    <strong>Green status:</strong> Technicians see elections as a career to grow in, not a battlefield to escape.
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Screen -->
+        <div id="final" class="screen">
+            <div class="header">
+                <h2>Overall Status</h2>
+                <button class="btn btn-secondary back-btn" onclick="showScreen('home')">← Back</button>
+            </div>
+
+            <div class="final-message">
+                <blockquote>
+                    "This app does not buy equipment, pass laws, hire staff, or fund journalism. It only makes visible what must be done and when."
+                </blockquote>
+            </div>
+
+            <div class="progress-section">
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span>Foundations</span>
+                        <span id="foundations-percent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="foundations-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span>Defense</span>
+                        <span id="defense-percent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="defense-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span>Sustainability</span>
+                        <span id="sustainability-percent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="sustainability-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span>People</span>
+                        <span id="people-percent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="people-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn" onclick="alert('This feature would generate a report of short-term priorities based on your selections.')">Lock in Next Election Changes</button>
+                <button class="btn" onclick="alert('This feature would create a detailed medium-term implementation plan.')">Draft Next-Cycle Plan</button>
+                <button class="btn" onclick="alert('This feature would document long-term commitments and policy goals.')">Write 2030+ Commitments</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Screen management
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            updateProgress();
+        }
+
+        // Tab management
+        function switchTab(section, period) {
+            const tabButtons = document.querySelectorAll(`#${section} .tab`);
+            const tabContents = document.querySelectorAll(`#${section} .tab-content`);
+            
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.style.display = 'none');
+            
+            event.target.classList.add('active');
+            document.getElementById(`${section}-${period}`).style.display = 'block';
+        }
+
+        // Profile selector
+        document.querySelectorAll('.profile-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.profile-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Progress calculation
+        function updateProgress() {
+            const sections = ['foundations', 'defense', 'sustainability', 'people'];
+            
+            sections.forEach(section => {
+                const checkboxes = document.querySelectorAll(`input[id^="${section.substring(0,2)}-"]`);
+                const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+                const total = checkboxes.length;
+                const percent = total > 0 ? Math.round((checked / total) * 100) : 0;
+                
+                // Update badge on home screen
+                const badge = document.getElementById(`${section}-badge`);
+                badge.className = 'status-badge';
+                if (percent >= 70) {
+                    badge.classList.add('green');
+                    badge.textContent = 'Green';
+                } else if (percent >= 40) {
+                    badge.classList.add('yellow');
+                    badge.textContent = 'Yellow';
+                } else {
+                    badge.classList.add('red');
+                    badge.textContent = 'Red';
+                }
+                
+                // Update progress bar on final screen
+                const progressBar = document.getElementById(`${section}-progress`);
+                const percentLabel = document.getElementById(`${section}-percent`);
+                if (progressBar && percentLabel) {
+                    progressBar.style.width = percent + '%';
+                    progressBar.className = 'progress-fill';
+                    if (percent >= 70) {
+                        // Green - keep default
+                    } else if (percent >= 40) {
+                        progressBar.classList.add('yellow');
+                    } else {
+                        progressBar.classList.add('red');
+                    }
+                    percentLabel.textContent = percent + '%';
+                }
+            });
+        }
+
+        // Load saved state from localStorage
+        function loadState() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                const saved = localStorage.getItem(cb.id);
+                if (saved === 'true') {
+                    cb.checked = true;
+                }
+            });
+            updateProgress();
+        }
+
+        // Save state to localStorage
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            cb.addEventListener('change', function() {
+                localStorage.setItem(this.id, this.checked);
+            });
+        });
+
+        // Initialize
+        loadState();
+    </script>
+</body>
+</html>

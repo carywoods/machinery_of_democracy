@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Election Workforce Monitor - U.S. Election Official Turnover Tracker</title>
+    <style>
+        :root {
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-brown-600: rgba(94, 82, 64, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-orange-500: rgba(168, 75, 47, 1);
+            
+            --color-brown-600-rgb: 94, 82, 64;
+            --color-teal-500-rgb: 33, 128, 141;
+            --color-red-500-rgb: 192, 21, 47;
+            --color-orange-500-rgb: 168, 75, 47;
+            
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-charcoal-700);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+            
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --space-32: 32px;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-gray-400-rgb: 119, 124, 124;
+                --color-teal-300-rgb: 50, 184, 198;
+                --color-gray-300-rgb: 167, 169, 169;
+                --color-gray-200-rgb: 245, 245, 245;
+                
+                --color-background: var(--color-charcoal-700);
+                --color-surface: var(--color-charcoal-800);
+                --color-text: var(--color-gray-200);
+                --color-text-secondary: rgba(var(--color-gray-300-rgb), 0.7);
+                --color-primary: rgba(var(--color-teal-300-rgb), 1);
+                --color-border: rgba(var(--color-gray-400-rgb), 0.3);
+                --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: var(--space-20);
+        }
+
+        header {
+            margin-bottom: var(--space-32);
+            padding-bottom: var(--space-24);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: var(--space-8);
+        }
+
+        .subtitle {
+            color: var(--color-text-secondary);
+            font-size: 16px;
+        }
+
+        .controls {
+            display: flex;
+            gap: var(--space-16);
+            margin-bottom: var(--space-32);
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: var(--space-8);
+            color: var(--color-text);
+        }
+
+        select {
+            width: 100%;
+            padding: var(--space-8) var(--space-12);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            background: var(--color-surface);
+            color: var(--color-text);
+            font-size: 14px;
+            font-family: var(--font-family-base);
+        }
+
+        select:focus {
+            outline: 2px solid var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: var(--space-20);
+            margin-bottom: var(--space-32);
+        }
+
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-20);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--space-8);
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: var(--space-8);
+        }
+
+        .card-change {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+        }
+
+        .chart-container {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-24);
+            margin-bottom: var(--space-32);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--space-20);
+        }
+
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+            display: block;
+        }
+
+        .state-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: var(--space-12);
+            margin-bottom: var(--space-32);
+        }
+
+        .state-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-base);
+            padding: var(--space-16);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .state-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .state-card.high-risk {
+            border-left: 4px solid var(--color-red-500);
+        }
+
+        .state-card.medium-risk {
+            border-left: 4px solid var(--color-orange-500);
+        }
+
+        .state-card.low-risk {
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .state-name {
+            font-weight: 600;
+            margin-bottom: var(--space-8);
+        }
+
+        .state-metric {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .case-studies {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: var(--space-20);
+        }
+
+        .case-study-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-20);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .case-study-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: var(--space-12);
+        }
+
+        .case-study-location {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-12);
+        }
+
+        .case-study-summary {
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--color-text);
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: var(--space-20);
+            margin-top: var(--space-32);
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .risk-high {
+            background: rgba(var(--color-red-500-rgb), 0.15);
+            color: var(--color-red-500);
+        }
+
+        .risk-medium {
+            background: rgba(var(--color-orange-500-rgb), 0.15);
+            color: var(--color-orange-500);
+        }
+
+        .risk-low {
+            background: rgba(var(--color-teal-500-rgb), 0.15);
+            color: var(--color-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Election Workforce Monitor</h1>
+            <p class="subtitle">Tracking turnover, threats, and capacity in U.S. election administration (2000-2024)</p>
+        </header>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="regionFilter">Region</label>
+                <select id="regionFilter">
+                    <option value="all">All Regions</option>
+                    <option value="northeast">Northeast</option>
+                    <option value="midwest">Midwest</option>
+                    <option value="south">South</option>
+                    <option value="west">West</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="yearFilter">Year Range</label>
+                <select id="yearFilter">
+                    <option value="all">All Years (2000-2024)</option>
+                    <option value="recent">Post-2020 (2020-2024)</option>
+                    <option value="historical">Pre-2020 (2000-2020)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="cards">
+            <div class="card">
+                <div class="card-title">National Turnover Rate</div>
+                <div class="card-value" id="turnoverRate">41%</div>
+                <div class="card-change">Highest in 25+ years (2024)</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Poll Workers</div>
+                <div class="card-value" id="pollWorkers">644K</div>
+                <div class="card-change">Down 130K from 2020</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Officials Threatened</div>
+                <div class="card-value" id="threatened">38%</div>
+                <div class="card-change">Up from 30% in 2023</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Officials 50+ Years</div>
+                <div class="card-value" id="aging">74%</div>
+                <div class="card-change">Up from 63% in 2004-2008</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="chart-title">National Turnover Trend (2000-2024)</h3>
+            <div id="turnoverChart"></div>
+        </div>
+
+        <h2 class="section-title">State-Level Risk Assessment</h2>
+        <div class="state-grid" id="stateGrid"></div>
+
+        <h2 class="section-title">Case Studies</h2>
+        <div class="case-studies" id="caseStudies"></div>
+    </div>
+
+    <script>
+        // Data
+        const turnoverData = {
+            years: [2000, 2004, 2008, 2012, 2016, 2020, 2024],
+            rates: [null, 28, 31, 32, 34, 36, 41]
+        };
+
+        const stateData = [
+            { name: 'Missouri', region: 'midwest', turnover: 87, harassment: 45, risk: 'high' },
+            { name: 'Arizona', region: 'west', turnover: 80, harassment: 67, risk: 'high' },
+            { name: 'Nevada', region: 'west', turnover: 60, harassment: 55, risk: 'high' },
+            { name: 'Pennsylvania', region: 'northeast', turnover: 58, harassment: 48, risk: 'high' },
+            { name: 'Michigan', region: 'midwest', turnover: 52, harassment: 52, risk: 'high' },
+            { name: 'Georgia', region: 'south', turnover: 48, harassment: 61, risk: 'high' },
+            { name: 'Wisconsin', region: 'midwest', turnover: 45, harassment: 49, risk: 'medium' },
+            { name: 'Florida', region: 'south', turnover: 42, harassment: 38, risk: 'medium' },
+            { name: 'Ohio', region: 'midwest', turnover: 39, harassment: 35, risk: 'medium' },
+            { name: 'North Carolina', region: 'south', turnover: 38, harassment: 40, risk: 'medium' },
+            { name: 'Texas', region: 'south', turnover: 35, harassment: 32, risk: 'medium' },
+            { name: 'California', region: 'west', turnover: 33, harassment: 44, risk: 'medium' },
+            { name: 'Colorado', region: 'west', turnover: 32, harassment: 38, risk: 'medium' },
+            { name: 'Illinois', region: 'midwest', turnover: 30, harassment: 28, risk: 'low' },
+            { name: 'New York', region: 'northeast', turnover: 28, harassment: 31, risk: 'low' },
+            { name: 'Virginia', region: 'south', turnover: 27, harassment: 29, risk: 'low' },
+            { name: 'Washington', region: 'west', turnover: 26, harassment: 25, risk: 'low' },
+            { name: 'Massachusetts', region: 'northeast', turnover: 24, harassment: 22, risk: 'low' },
+            { name: 'Oregon', region: 'west', turnover: 23, harassment: 21, risk: 'low' },
+            { name: 'Connecticut', region: 'northeast', turnover: 22, harassment: 20, risk: 'low' }
+        ];
+
+        const caseStudiesData = [
+            {
+                title: 'Luzerne County Crisis',
+                location: 'Pennsylvania',
+                summary: '5 election directors in 5 years. Nov 2022 ballot paper shortage affected 44 precincts when acting director with only 3 months experience faced crisis. Cycle of inexperience → errors → distrust → resignations.'
+            },
+            {
+                title: 'Maricopa County Takeover',
+                location: 'Arizona',
+                summary: '12 of 15 county election chiefs departed since 2020. Outgoing recorder suffered death threats. 2024 election saw election denier backed by fake electors win office.'
+            },
+            {
+                title: 'Rochester Hills Threats',
+                location: 'Michigan',
+                summary: 'Clerk Tina Barton received death threat voicemail: "knife to throat, take you out your family." Perpetrator sentenced to 14 months. Barton left position after 2020.'
+            },
+            {
+                title: 'Greene County Errors',
+                location: 'Pennsylvania',
+                summary: '2023 ballot error instructed voters to vote for 3 candidates when only 2 allowed, would have invalidated votes. Attributed to inexperienced administrators after turnover.'
+            },
+            {
+                title: 'Missouri Mass Exodus',
+                location: 'Missouri',
+                summary: '87% of 110 county clerks left positions between 2020-2024, representing catastrophic institutional knowledge loss statewide.'
+            },
+            {
+                title: 'Pennsylvania Experience Loss',
+                location: 'Pennsylvania',
+                summary: 'Lost 293 combined years of experience across 58 departed officials. 21% fewer total experience years in 2024 vs 2019, increasing error rates and crisis vulnerability.'
+            }
+        ];
+
+        // Chart rendering with SVG instead of canvas
+        function drawChart() {
+            const container = document.getElementById('turnoverChart').parentElement;
+            const chartDiv = document.getElementById('turnoverChart');
+            
+            // Clear existing chart
+            chartDiv.innerHTML = '';
+            
+            const width = Math.min(container.clientWidth - 48, 900);
+            const height = 300;
+            const padding = { top: 20, right: 20, bottom: 40, left: 50 };
+            const chartWidth = width - padding.left - padding.right;
+            const chartHeight = height - padding.top - padding.bottom;
+
+            // Create SVG
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', width);
+            svg.setAttribute('height', height);
+            svg.style.display = 'block';
+
+            // Get colors
+            const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const textColor = isDark ? '#f5f5f5' : '#1f2121';
+            const primaryColor = isDark ? '#32b8c6' : '#21808d';
+            const gridColor = isDark ? 'rgba(119, 124, 124, 0.3)' : 'rgba(94, 82, 64, 0.2)';
+
+            // Draw grid lines
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (chartHeight / 5) * i;
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', padding.left);
+                line.setAttribute('y1', y);
+                line.setAttribute('x2', padding.left + chartWidth);
+                line.setAttribute('y2', y);
+                line.setAttribute('stroke', gridColor);
+                line.setAttribute('stroke-width', '1');
+                svg.appendChild(line);
+            }
+
+            // Draw axes
+            const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            xAxis.setAttribute('x1', padding.left);
+            xAxis.setAttribute('y1', padding.top + chartHeight);
+            xAxis.setAttribute('x2', padding.left + chartWidth);
+            xAxis.setAttribute('y2', padding.top + chartHeight);
+            xAxis.setAttribute('stroke', textColor);
+            xAxis.setAttribute('stroke-width', '2');
+            svg.appendChild(xAxis);
+
+            const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            yAxis.setAttribute('x1', padding.left);
+            yAxis.setAttribute('y1', padding.top);
+            yAxis.setAttribute('x2', padding.left);
+            yAxis.setAttribute('y2', padding.top + chartHeight);
+            yAxis.setAttribute('stroke', textColor);
+            yAxis.setAttribute('stroke-width', '2');
+            svg.appendChild(yAxis);
+
+            // Draw line and points
+            const xStep = chartWidth / (turnoverData.years.length - 1);
+            const yMax = 50;
+            let pathD = '';
+
+            turnoverData.rates.forEach((rate, index) => {
+                if (rate !== null) {
+                    const x = padding.left + index * xStep;
+                    const y = padding.top + chartHeight - (rate / yMax) * chartHeight;
+                    
+                    if (pathD === '') {
+                        pathD = `M ${x} ${y}`;
+                    } else {
+                        pathD += ` L ${x} ${y}`;
+                    }
+
+                    // Draw point
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', x);
+                    circle.setAttribute('cy', y);
+                    circle.setAttribute('r', '5');
+                    circle.setAttribute('fill', primaryColor);
+                    svg.appendChild(circle);
+
+                    // Add value label above point
+                    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    label.setAttribute('x', x);
+                    label.setAttribute('y', y - 10);
+                    label.setAttribute('text-anchor', 'middle');
+                    label.setAttribute('fill', textColor);
+                    label.setAttribute('font-size', '12');
+                    label.setAttribute('font-family', '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif');
+                    label.textContent = rate + '%';
+                    svg.appendChild(label);
+                }
+            });
+
+            // Draw path
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', pathD);
+            path.setAttribute('stroke', primaryColor);
+            path.setAttribute('stroke-width', '3');
+            path.setAttribute('fill', 'none');
+            svg.insertBefore(path, svg.firstChild);
+
+            // X-axis labels
+            turnoverData.years.forEach((year, index) => {
+                const x = padding.left + index * xStep;
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', x);
+                text.setAttribute('y', height - 15);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('fill', textColor);
+                text.setAttribute('font-size', '12');
+                text.setAttribute('font-family', '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif');
+                text.textContent = year;
+                svg.appendChild(text);
+            });
+
+            // Y-axis labels
+            for (let i = 0; i <= 5; i++) {
+                const value = (yMax / 5) * (5 - i);
+                const y = padding.top + (chartHeight / 5) * i;
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', padding.left - 10);
+                text.setAttribute('y', y + 4);
+                text.setAttribute('text-anchor', 'end');
+                text.setAttribute('fill', textColor);
+                text.setAttribute('font-size', '12');
+                text.setAttribute('font-family', '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif');
+                text.textContent = value + '%';
+                svg.appendChild(text);
+            }
+
+            chartDiv.appendChild(svg);
+        }
+
+        // State grid rendering
+        function renderStates(region = 'all') {
+            const grid = document.getElementById('stateGrid');
+            grid.innerHTML = '';
+
+            const filtered = region === 'all' 
+                ? stateData 
+                : stateData.filter(s => s.region === region);
+
+            filtered.forEach(state => {
+                const card = document.createElement('div');
+                card.className = `state-card ${state.risk}-risk`;
+                card.innerHTML = `
+                    <div class="state-name">${state.name}</div>
+                    <div class="state-metric">Turnover: ${state.turnover}%</div>
+                    <div class="state-metric">Harassment: ${state.harassment}%</div>
+                    <span class="risk-badge risk-${state.risk}">${state.risk.toUpperCase()} RISK</span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Case studies rendering
+        function renderCaseStudies() {
+            const container = document.getElementById('caseStudies');
+            container.innerHTML = '';
+
+            caseStudiesData.forEach(study => {
+                const card = document.createElement('div');
+                card.className = 'case-study-card';
+                card.innerHTML = `
+                    <div class="case-study-title">${study.title}</div>
+                    <div class="case-study-location">${study.location}</div>
+                    <div class="case-study-summary">${study.summary}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Event listeners
+        document.getElementById('regionFilter').addEventListener('change', (e) => {
+            renderStates(e.target.value);
+        });
+
+        document.getElementById('yearFilter').addEventListener('change', (e) => {
+            // Update metrics based on year range
+            if (e.target.value === 'recent') {
+                document.getElementById('turnoverRate').textContent = '41%';
+                document.getElementById('pollWorkers').textContent = '644K';
+            } else if (e.target.value === 'historical') {
+                document.getElementById('turnoverRate').textContent = '31%';
+                document.getElementById('pollWorkers').textContent = '774K';
+            } else {
+                document.getElementById('turnoverRate').textContent = '41%';
+                document.getElementById('pollWorkers').textContent = '644K';
+            }
+        });
+
+        // Initial render
+        window.addEventListener('load', () => {
+            drawChart();
+            renderStates();
+            renderCaseStudies();
+        });
+
+        // Redraw chart on resize
+        window.addEventListener('resize', () => {
+            drawChart();
+        });
+    </script>
+</body>
+</html>

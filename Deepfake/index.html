@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deepfake Election Tracker</title>
+    <style>
+        :root {
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-gray-200: rgba(245, 245, 245, 1);
+            --color-gray-300: rgba(167, 169, 169, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-charcoal-700: rgba(31, 33, 33, 1);
+            --color-charcoal-800: rgba(38, 40, 40, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-red-500: rgba(192, 21, 47, 1);
+            --color-orange-500: rgba(168, 75, 47, 1);
+            --color-brown-600-rgb: 94, 82, 64;
+            --color-teal-500-rgb: 33, 128, 141;
+            
+            --color-background: var(--color-cream-50);
+            --color-surface: var(--color-cream-100);
+            --color-text: var(--color-slate-900);
+            --color-text-secondary: var(--color-slate-500);
+            --color-primary: var(--color-teal-500);
+            --color-primary-hover: var(--color-teal-600);
+            --color-border: rgba(var(--color-brown-600-rgb), 0.2);
+            --color-card-border: rgba(var(--color-brown-600-rgb), 0.12);
+            --color-error: var(--color-red-500);
+            --color-warning: var(--color-orange-500);
+            
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --space-32: 32px;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-gray-400-rgb: 119, 124, 124;
+                --color-teal-300-rgb: 50, 184, 198;
+                --color-background: var(--color-charcoal-700);
+                --color-surface: var(--color-charcoal-800);
+                --color-text: var(--color-gray-200);
+                --color-text-secondary: rgba(var(--color-gray-300), 0.7);
+                --color-primary: rgba(50, 184, 198, 1);
+                --color-border: rgba(var(--color-gray-400-rgb), 0.3);
+                --color-card-border: rgba(var(--color-gray-400-rgb), 0.2);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            background: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+            padding: var(--space-20);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: var(--space-32);
+            padding: var(--space-24) 0;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-12);
+            color: var(--color-text);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--color-text-secondary);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-20);
+            margin-bottom: var(--space-32);
+        }
+
+        .stat-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-24);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: var(--space-8);
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+
+        .filters {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-24);
+            margin-bottom: var(--space-24);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: var(--space-16);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group label {
+            font-weight: 500;
+            color: var(--color-text);
+            margin-right: var(--space-8);
+        }
+
+        select, input {
+            padding: var(--space-8) var(--space-12);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            background: var(--color-background);
+            color: var(--color-text);
+            font-family: var(--font-family-base);
+            font-size: 0.95rem;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        .incidents-container {
+            display: grid;
+            gap: var(--space-20);
+        }
+
+        .incident-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-24);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .incident-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: var(--space-16);
+            gap: var(--space-16);
+        }
+
+        .incident-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--color-text);
+            flex: 1;
+        }
+
+        .incident-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .badge-school-board { background: rgba(59, 130, 246, 0.15); color: rgb(29, 78, 216); }
+        .badge-mayor { background: rgba(245, 158, 11, 0.15); color: rgb(180, 83, 9); }
+        .badge-council { background: rgba(34, 197, 94, 0.15); color: rgb(21, 128, 61); }
+        .badge-criminal { background: rgba(239, 68, 68, 0.15); color: rgb(185, 28, 28); }
+        .badge-presidential { background: rgba(147, 51, 234, 0.15); color: rgb(107, 33, 168); }
+
+        .incident-meta {
+            display: flex;
+            gap: var(--space-20);
+            margin-bottom: var(--space-16);
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            flex-wrap: wrap;
+        }
+
+        .incident-meta span {
+            display: flex;
+            align-items: center;
+            gap: var(--space-8);
+        }
+
+        .incident-description {
+            color: var(--color-text);
+            margin-bottom: var(--space-16);
+            line-height: 1.7;
+        }
+
+        .incident-outcome {
+            padding: var(--space-12);
+            background: rgba(var(--color-teal-500-rgb), 0.1);
+            border-left: 3px solid var(--color-primary);
+            border-radius: var(--radius-base);
+            font-size: 0.9rem;
+        }
+
+        .outcome-label {
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 4px;
+        }
+
+        .legislation-section {
+            margin-top: var(--space-32);
+            padding: var(--space-24);
+            background: var(--color-surface);
+            border: 1px solid var(--color-card-border);
+            border-radius: var(--radius-lg);
+        }
+
+        .legislation-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: var(--space-20);
+            color: var(--color-text);
+        }
+
+        .state-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: var(--space-12);
+            margin-top: var(--space-16);
+        }
+
+        .state-item {
+            padding: var(--space-12);
+            background: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-base);
+            font-size: 0.9rem;
+        }
+
+        .state-name {
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: var(--space-32);
+            color: var(--color-text-secondary);
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .incident-header { flex-direction: column; }
+            .incident-badge { align-self: flex-start; }
+            .filter-group { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Deepfake Election Tracker</h1>
+            <p class="subtitle">Verified cases of AI-generated content used to mislead voters or damage reputations in local and state elections (2019-2025)</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="total-incidents">8</div>
+                <div class="stat-label">Total Verified Incidents</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">26</div>
+                <div class="stat-label">States with Legislation</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">179</div>
+                <div class="stat-label">Deepfake Incidents (Q1 2025)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">3,000%</div>
+                <div class="stat-label">Fraud Increase (2023)</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="race-filter">Race Type:</label>
+                <select id="race-filter">
+                    <option value="all">All Races</option>
+                    <option value="school-board">School Board</option>
+                    <option value="mayor">Mayor</option>
+                    <option value="council">City Council</option>
+                    <option value="criminal">Criminal/Non-Electoral</option>
+                    <option value="presidential">Presidential Primary</option>
+                </select>
+
+                <label for="year-filter">Year:</label>
+                <select id="year-filter">
+                    <option value="all">All Years</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2022">2022</option>
+                </select>
+
+                <label for="search">Search:</label>
+                <input type="text" id="search" placeholder="Location, candidate, keyword...">
+            </div>
+        </div>
+
+        <div class="incidents-container" id="incidents-container"></div>
+
+        <div class="legislation-section">
+            <h2>State Legislation Status</h2>
+            <p style="margin-bottom: 20px; color: var(--color-text-secondary);">26 states have enacted laws regulating political deepfakes as of 2025. Click on states for details.</p>
+            <div class="state-list">
+                <div class="state-item"><span class="state-name">California</span></div>
+                <div class="state-item"><span class="state-name">Pennsylvania</span></div>
+                <div class="state-item"><span class="state-name">Minnesota</span></div>
+                <div class="state-item"><span class="state-name">Texas</span></div>
+                <div class="state-item"><span class="state-name">Florida</span></div>
+                <div class="state-item"><span class="state-name">New Mexico</span></div>
+                <div class="state-item"><span class="state-name">Alabama</span></div>
+                <div class="state-item"><span class="state-name">Hawaii</span></div>
+                <div class="state-item"><span class="state-name">New York</span></div>
+                <div class="state-item"><span class="state-name">Indiana</span></div>
+                <div class="state-item"><span class="state-name">Utah</span></div>
+                <div class="state-item"><span class="state-name">Wisconsin</span></div>
+                <div class="state-item"><span class="state-name">Arizona</span></div>
+                <div class="state-item"><span class="state-name">Colorado</span></div>
+                <div class="state-item"><span class="state-name">Michigan</span></div>
+                <div class="state-item"><span class="state-name">Washington</span></div>
+                <div class="state-item"><span class="state-name">Mississippi</span></div>
+                <div class="state-item"><span class="state-name">Oregon</span></div>
+                <div class="state-item"><span class="state-name">Maryland</span></div>
+                <div class="state-item"><span class="state-name">Louisiana</span></div>
+                <div class="state-item"><span class="state-name">Ohio</span></div>
+                <div class="state-item"><span class="state-name">Virginia</span></div>
+                <div class="state-item"><span class="state-name">Illinois</span></div>
+                <div class="state-item"><span class="state-name">Connecticut</span></div>
+                <div class="state-item"><span class="state-name">Massachusetts</span></div>
+                <div class="state-item"><span class="state-name">Nevada</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const incidents = [
+            {
+                id: 1,
+                title: "South-Western City School District AI Campaign Video",
+                location: "Ohio",
+                year: 2025,
+                type: "school-board",
+                date: "November 2025",
+                description: "Republican-endorsed candidates Chris Boso, Steve Feucht, and Jason Gocha deployed an AI-generated video featuring synthetic footage of their Democrat-endorsed opponents (Camille Peterson, Chelsea Alkire, and Kelly Dillon) making fabricated statements. Despite controversy and the video being labeled as AI-generated, the Republican candidates won the election.",
+                outcome: "Republican candidates prevailed. Boso defended the deepfake as 'lighthearted' aimed at boosting turnout. Peterson condemned it as 'downright wrong.'",
+                impact: "Demonstrated that even disclosed deepfakes can reshape races where voters lack experience evaluating synthetic media."
+            },
+            {
+                id: 2,
+                title: "Shreveport Mayoral Race Deepfake Ad",
+                location: "Louisiana",
+                year: 2022,
+                type: "mayor",
+                date: "October 2022",
+                description: "Incumbent Mayor Adrian Perkins faced a satirical TV commercial funded by PAC 'People Over Politics' using deep learning to superimpose his face onto an actor's body, depicting him as a high school student being reprimanded. Despite carrying a disclaimer, Perkins believes the ad significantly affected his campaign.",
+                outcome: "Perkins stated: 'One hundred percent the deepfake ad affected our campaign because we were a down-ballot, less resourced place.' He lacked funds to counter the attack.",
+                impact: "Marked one of the earliest documented deepfake deployments in American politics, illustrating asymmetric vulnerability of smaller campaigns."
+            },
+            {
+                id: 3,
+                title: "Dallas City Council Runoff AI Video",
+                location: "Texas",
+                year: 2025,
+                type: "council",
+                date: "May 2025",
+                description: "In a city council runoff between Bill Roth and Jeff Kidner, a Roth supporter created a deepfake video using audio from Kidner's podcast appearance, manipulating it with AI to present him unfavorably. The creator claimed exemption from regulation by asserting he wasn't paid by any campaign.",
+                outcome: "The incident highlighted enforcement loopholes—creators can avoid regulation by claiming non-compensation, even when supporting specific candidates.",
+                impact: "Demonstrated difficulty of enforcing disclosure requirements when actors operate independently of official campaigns."
+            },
+            {
+                id: 4,
+                title: "Pikesville High School Principal Racist Audio",
+                location: "Maryland",
+                year: 2024,
+                type: "criminal",
+                date: "January 2024",
+                description: "Athletic director Dazhon Darien allegedly created AI-generated audio depicting Principal Eric Eiswert making racist and antisemitic remarks. The deepfake spread rapidly on social media, triggering death threats against Eiswert and his administrative leave. Forensic analysis revealed AI-generated elements edited with background noise for authenticity.",
+                outcome: "Darien pleaded guilty to disturbing school operations and received a four-month sentence. Principal Eiswert filed a lawsuit against Baltimore County schools.",
+                impact: "While not electoral, demonstrated deepfakes' capacity for reputational destruction of public officials and established criminal prosecution precedent."
+            },
+            {
+                id: 5,
+                title: "Biden New Hampshire Primary Robocall",
+                location: "New Hampshire",
+                year: 2024,
+                type: "presidential",
+                date: "January 2024",
+                description: "Political consultant Steve Kramer orchestrated robocalls featuring AI-generated voice mimicking President Biden, reaching ~5,000 voters with messages discouraging primary participation. The fake Biden urged Democrats to 'save your vote for the November election.' Kramer hired a street magician to create the audio using ElevenLabs for $1 in under 20 minutes.",
+                outcome: "FCC imposed $6 million fine. New Hampshire indicted Kramer on 13 felony voter suppression charges and 13 misdemeanor impersonation charges. In June 2025, jury acquitted Kramer of all charges.",
+                impact: "Most prominent deepfake attack on American electoral infrastructure. Acquittal despite admission signals potential enforcement challenges and loopholes in voter suppression statutes."
+            },
+            {
+                id: 6,
+                title: "Shreveport Follow-up Legislative Response",
+                location: "Louisiana",
+                year: 2024,
+                type: "mayor",
+                date: "February 2024",
+                description: "Following the 2022 mayoral deepfake incident, Louisiana advocates and legislators pushed for stronger regulations. The incident catalyzed statewide discussion about deepfake threats in down-ballot races and resource disparities.",
+                outcome: "Louisiana joined states considering or enacting deepfake legislation. Former Mayor Perkins became advocate for stronger protections for local candidates.",
+                impact: "Transformed a single incident into broader policy conversation about protecting under-resourced campaigns from synthetic media attacks."
+            },
+            {
+                id: 7,
+                title: "Columbus AI-Generated School Board Campaign",
+                location: "Ohio",
+                year: 2025,
+                type: "school-board",
+                date: "November 2025",
+                description: "Another Ohio school board race involving AI-generated campaign content sparked controversy. Details mirror the South-Western City Schools incident, showing pattern of AI adoption in hyperlocal races.",
+                outcome: "Continued debate about whether AI-generated campaign materials constitute innovation or manipulation, particularly when disclosed.",
+                impact: "Part of emerging pattern of AI adoption in school board races, raising questions about appropriate boundaries for synthetic media in local elections."
+            },
+            {
+                id: 8,
+                title: "Multiple State Election Board Preparedness Exercises",
+                location: "Various",
+                year: 2024,
+                type: "presidential",
+                date: "Throughout 2024",
+                description: "Arizona, Michigan, Colorado, and other states conducted tabletop exercises confronting hypothetical Election Day scenarios involving deepfake videos and voice-cloning technology. Fictional scenarios included AI-generated fake news headlines claiming shootings at polling places and election rescheduling.",
+                outcome: "State election officials identified deepfakes as top concern. Michigan SOS Jocelyn Benson warned of 'hyper-localized' disinformation campaigns. Colorado SOS Jena Griswold convened AI risk working groups.",
+                impact: "Demonstrated election officials' recognition of threat, but also revealed limited capacity for rapid response if multiple deepfakes emerge simultaneously on Election Day."
+            }
+        ];
+
+        function renderIncidents(filteredIncidents) {
+            const container = document.getElementById('incidents-container');
+            
+            if (filteredIncidents.length === 0) {
+                container.innerHTML = '<div class="no-results">No incidents match your filters</div>';
+                return;
+            }
+
+            container.innerHTML = filteredIncidents.map(incident => `
+                <div class="incident-card">
+                    <div class="incident-header">
+                        <h3 class="incident-title">${incident.title}</h3>
+                        <span class="incident-badge badge-${incident.type}">${incident.type.replace('-', ' ').toUpperCase()}</span>
+                    </div>
+                    <div class="incident-meta">
+                        <span>📍 ${incident.location}</span>
+                        <span>📅 ${incident.date}</span>
+                        <span>🗓️ ${incident.year}</span>
+                    </div>
+                    <div class="incident-description">${incident.description}</div>
+                    <div class="incident-outcome">
+                        <div class="outcome-label">Outcome & Impact</div>
+                        <div>${incident.outcome}</div>
+                        ${incident.impact ? `<div style="margin-top: 8px; font-style: italic;">${incident.impact}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterIncidents() {
+            const raceFilter = document.getElementById('race-filter').value;
+            const yearFilter = document.getElementById('year-filter').value;
+            const searchTerm = document.getElementById('search').value.toLowerCase();
+
+            let filtered = incidents.filter(incident => {
+                const matchesRace = raceFilter === 'all' || incident.type === raceFilter;
+                const matchesYear = yearFilter === 'all' || incident.year.toString() === yearFilter;
+                const matchesSearch = searchTerm === '' || 
+                    incident.title.toLowerCase().includes(searchTerm) ||
+                    incident.location.toLowerCase().includes(searchTerm) ||
+                    incident.description.toLowerCase().includes(searchTerm);
+
+                return matchesRace && matchesYear && matchesSearch;
+            });
+
+            document.getElementById('total-incidents').textContent = filtered.length;
+            renderIncidents(filtered);
+        }
+
+        document.getElementById('race-filter').addEventListener('change', filterIncidents);
+        document.getElementById('year-filter').addEventListener('change', filterIncidents);
+        document.getElementById('search').addEventListener('input', filterIncidents);
+
+        // Initial render
+        renderIncidents(incidents);
+    </script>
+</body>
+</html>
+
