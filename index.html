@@ -11,8 +11,21 @@
         <!-- Main Header -->
         <header class="main-header">
             <div class="header-content">
-                <h1 class="main-title">The Machinery of Democracy</h1>
-                <p class="main-subtitle">An interactive companion to understanding American electoral infrastructure</p>
+                <div class="header-top">
+                    <div class="header-text">
+                        <h1 class="main-title">The Machinery of Democracy</h1>
+                        <p class="main-subtitle">An interactive companion to understanding American electoral infrastructure</p>
+                    </div>
+                    <div class="book-links">
+                        <label for="book-format" class="book-label">Get the Book:</label>
+                        <select id="book-format" class="book-select">
+                            <option value="">Choose format...</option>
+                            <option value="https://www.amazon.com/Machinery-Democracy-Infrastructure-American-Political/dp/1890222119">Paperback</option>
+                            <option value="https://www.amazon.com/Machinery-Democracy-Infrastructure-American-Political/dp/1890222135">Hardback</option>
+                            <option value="https://www.amazon.com/Machinery-Democracy-Infrastructure-American-Political-ebook/dp/B0GGCJH62X">Kindle</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -80,5 +93,16 @@
 
     <!-- Chart.js for data visualization (used by some chapters) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Book format selector handler -->
+    <script>
+        document.getElementById('book-format').addEventListener('change', function() {
+            if (this.value) {
+                window.open(this.value, '_blank', 'noopener,noreferrer');
+                // Reset to placeholder after opening
+                setTimeout(() => { this.value = ''; }, 100);
+            }
+        });
+    </script>
 </body>
 </html>

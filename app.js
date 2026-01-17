@@ -7,13 +7,15 @@ class MachineryOfDemocracy {
     constructor() {
         this.currentChapter = null;
         this.chapters = new Map();
-        this.container = document.getElementById('chapter-container');
-        this.navButtons = document.querySelectorAll('.chapter-button');
-
-        this.init();
+        this.container = null;
+        this.navButtons = null;
     }
 
     init() {
+        // Get DOM references
+        this.container = document.getElementById('chapter-container');
+        this.navButtons = document.querySelectorAll('.chapter-button');
+
         // Set up navigation event listeners
         this.navButtons.forEach(button => {
             button.addEventListener('click', () => {
@@ -90,5 +92,15 @@ class MachineryOfDemocracy {
     }
 }
 
-// Initialize the application
+// Create app instance immediately so chapter scripts can register
 const app = new MachineryOfDemocracy();
+
+// Initialize after DOM and all chapter scripts are loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        app.init();
+    });
+} else {
+    // DOM already loaded
+    app.init();
+}
