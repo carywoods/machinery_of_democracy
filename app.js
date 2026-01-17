@@ -94,13 +94,3 @@ class MachineryOfDemocracy {
 
 // Create app instance immediately so chapter scripts can register
 const app = new MachineryOfDemocracy();
-
-// Initialize after DOM and all chapter scripts are loaded
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        app.init();
-    });
-} else {
-    // DOM already loaded
-    app.init();
-}

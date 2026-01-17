@@ -94,6 +94,20 @@
     <!-- Chart.js for data visualization (used by some chapters) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <!-- Initialize app after all chapters have registered -->
+    <script>
+        // All chapter scripts have loaded by this point
+        // Initialize the app when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                app.init();
+            });
+        } else {
+            // DOM already loaded
+            app.init();
+        }
+    </script>
+
     <!-- Book format selector handler -->
     <script>
         document.getElementById('book-format').addEventListener('change', function() {
