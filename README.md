@@ -1,14 +1,15 @@
 # The Machinery of Democracy - Interactive Companion
 
-A unified web application consolidating 10 chapter-based interactive tools exploring American electoral infrastructure, from ballot access to voting machines.
+A unified web application consolidating 11 chapter-based interactive tools exploring American electoral infrastructure, from ballot access to rebuilding democracy.
 
 ## Overview
 
-This application provides an interactive companion to "The Machinery of Democracy" book, allowing readers to explore data visualizations, interactive tools, and case studies for each chapter.
+This application provides an interactive companion to "The Machinery of Democracy" book, allowing readers to explore data visualizations, interactive tools, and case studies for each chapter. The app includes a convenient dropdown to purchase the book on Amazon in paperback, hardback, or Kindle format.
 
 ## Features
 
-- **10 Interactive Chapters**: Each chapter has unique data visualizations and interactive elements
+- **11 Interactive Chapters**: Each chapter has unique data visualizations and interactive elements
+- **Book Purchase Integration**: Quick access to purchase the book on Amazon (Paperback, Hardback, or Kindle)
 - **Unified Navigation**: Seamless chapter switching without page reloads
 - **Responsive Design**: Works on desktop, tablet, and mobile devices
 - **Dark Mode Support**: Automatic dark mode based on system preferences
@@ -32,7 +33,8 @@ This application provides an interactive companion to "The Machinery of Democrac
 │   ├── chapter7-donations.js
 │   ├── chapter8-state-federal.js
 │   ├── chapter9-turnover.js
-│   └── chapter10-voting-machines.js
+│   ├── chapter10-voting-machines.js
+│   └── chapter11-rebuilding.js
 └── README.md               # This file
 ```
 
@@ -141,11 +143,24 @@ Edit `index.html` and add a new button to the chapter navigation:
 
 ### Step 3: Include the Script
 
-Add a script tag in `index.html` after the existing chapter scripts:
+Add a script tag in `index.html` after the existing chapter scripts, **but before the app initialization script**:
 
 ```html
-<script src="chapters/chapter11-new-topic.js"></script>
+<!-- Chapter Modules (loaded dynamically) -->
+<script src="chapters/chapter1-ballot-access.js"></script>
+<!-- ... other chapters ... -->
+<script src="chapters/chapter12-new-topic.js"></script>
+
+<!-- Chart.js for data visualization (used by some chapters) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Initialize app after all chapters have registered -->
+<script>
+    // App initialization code - MUST come after all chapter scripts
+</script>
 ```
+
+**Important:** The order of scripts matters! Chapter scripts must load before the app initialization script runs.
 
 ### Step 4: Update Documentation
 
@@ -308,6 +323,28 @@ Each chapter's data is contained within its JavaScript file. To update:
 4. Save and refresh the browser
 
 No build step is required!
+
+## Technical Notes
+
+### Script Loading Order
+
+The application uses a specific script loading order to ensure proper initialization:
+
+1. `app.js` loads first and creates the global `app` instance
+2. All chapter scripts load and register themselves via `app.registerChapter()`
+3. Chart.js library loads
+4. An inline script calls `app.init()` to start the application
+
+This order is critical - if `app.init()` runs before chapters register, you'll see a "Chapter Not Found" error.
+
+### Book Purchase Feature
+
+The header includes a dropdown selector that opens Amazon links for the book in three formats:
+- Paperback
+- Hardback
+- Kindle
+
+The selector resets after each use, allowing repeated access without navigation.
 
 ## Design Philosophy
 

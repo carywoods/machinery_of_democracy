@@ -4,12 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-**UPDATE (Nov 25, 2025):** This repository has been refactored from 10 standalone HTML apps into a unified web application called "The Machinery of Democracy - Interactive Companion."
+**UPDATE (Jan 2026):** This repository has been refactored from 10 standalone HTML apps into a unified web application called "The Machinery of Democracy - Interactive Companion."
 
 ### Current State
 - **Main Application**: `index.html` + `app.js` + `css/shared.css`
-- **10 Chapter Modules**: Located in `chapters/` directory
-- **Status**: Awaiting chapter-to-book mapping clarification (see PROJECT_NOTES.md)
+- **11 Chapter Modules**: Located in `chapters/` directory (chapter1-ballot-access.js through chapter11-rebuilding.js)
+- **Book Purchase Integration**: Header dropdown for purchasing the book on Amazon
+- **Status**: Fully functional with proper script loading order
 
 ### Original Structure (Still Present)
 This started as a collection of standalone, interactive web applications focused on political and electoral topics. Each original application is still in its own directory and runs entirely in the browser using vanilla HTML, CSS, and JavaScript with no build process or dependencies beyond CDN-hosted libraries.
@@ -136,16 +137,17 @@ Applications use modern JavaScript (ES6+) and CSS features. Target modern browse
 3. **CSS specificity**: Embedded styles have global scope; use specific class names to avoid conflicts
 4. **Modal state**: Remember to remove `.active` class when closing modals
 5. **File paths**: When separating files, use relative paths correctly (e.g., `href="style.css"`, not `/style.css`)
+6. **Script loading order**: In the unified app, chapter scripts MUST load before `app.init()` is called, or chapters won't register properly
 
 ---
 
 ## NEW UNIFIED APPLICATION STRUCTURE
 
 ### Application Files
-- **index.html** - Main application shell with navigation
+- **index.html** - Main application shell with navigation and book purchase dropdown
 - **app.js** - MachineryOfDemocracy class that handles chapter switching
-- **css/shared.css** - Consolidated design system (13KB)
-- **chapters/** - 10 modular chapter JavaScript files
+- **css/shared.css** - Consolidated design system with responsive styling
+- **chapters/** - 11 modular chapter JavaScript files (chapter1-ballot-access.js through chapter11-rebuilding.js)
 
 ### Chapter Module Pattern
 Each chapter in `chapters/` follows this pattern:
@@ -177,10 +179,21 @@ python3 -m http.server 8000
 ```
 
 ### Key Files for Understanding
-1. **PROJECT_NOTES.md** - Current status, questions, next steps
-2. **README.md** - Complete usage guide
-3. **app.js** - Chapter switching logic
-4. **css/shared.css** - Design system reference
+1. **README.md** - Complete usage guide with chapter creation instructions
+2. **app.js** - Chapter switching logic and MachineryOfDemocracy class
+3. **css/shared.css** - Design system reference with all CSS variables
+4. **index.html** - Application shell and script loading order
 
-### Current Open Question
-Need to map 10 apps to 11 book chapters. See PROJECT_NOTES.md for details.
+### Critical Implementation Details
+
+**Script Loading Order:**
+The app initialization must happen AFTER all chapter scripts load. The order in index.html is:
+1. `app.js` - Creates global `app` instance
+2. All chapter scripts - Each calls `app.registerChapter()`
+3. Chart.js CDN
+4. Inline script that calls `app.init()` - Starts the application
+
+If `app.init()` runs before chapters register, users will see "Chapter Not Found" error.
+
+**Book Purchase Feature:**
+The header contains a `<select>` dropdown with three book purchase options (Paperback, Hardback, Kindle). An inline script handles the selection, opens the Amazon link in a new tab, and resets the dropdown.
