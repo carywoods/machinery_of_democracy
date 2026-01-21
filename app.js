@@ -127,11 +127,13 @@ class MachineryOfDemocracy {
                 setTimeout(() => chapter.init(), 0);
             }
 
-            // Track chapter view
-            this.track('chapter_view', {
-                chapter_id: chapterId,
-                chapter_title: this.getChapterTitle(chapterId)
-            });
+            // Track chapter view (only when not triggered by hashchange)
+            if (updateHash) {
+                this.track('chapter_view', {
+                    chapter_id: chapterId,
+                    chapter_title: this.getChapterTitle(chapterId)
+                });
+            }
 
             // Scroll to top
             window.scrollTo(0, 0);
