@@ -1,0 +1,28 @@
+# .htaccess for Analytics Directory
+# Upload this file alongside track.php to protect your analytics data
+# Rename this file to ".htaccess" (remove the -analytics suffix)
+
+# Prevent direct access to CSV files (analytics data)
+<Files "*.csv">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Prevent direct access to rate limit files
+<FilesMatch "^rate_limit_.*\.txt$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Allow PHP scripts to run
+<Files "track.php">
+    Order Allow,Deny
+    Allow from all
+</Files>
+
+# Optional: Password protect the entire directory
+# Uncomment these lines and create .htpasswd file for extra security
+# AuthType Basic
+# AuthName "Analytics Area"
+# AuthUserFile /path/to/.htpasswd
+# Require valid-user

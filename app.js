@@ -9,6 +9,49 @@ class MachineryOfDemocracy {
         this.chapters = new Map();
         this.container = null;
         this.navButtons = null;
+
+        // Analytics configuration
+        // Set to null to disable tracking, or your tracking endpoint URL
+        this.trackingEndpoint = 'https://hcwoods.com/track.php';
+        this.trackingEnabled = true;
+    }
+
+    /**
+     * Send tracking event to analytics endpoint
+     */
+    track(eventType, additionalData = {}) {
+        if (!this.trackingEnabled || !this.trackingEndpoint) {
+            return;
+        }
+
+        try {
+            const data = {
+                timestamp: new Date().toISOString(),
+                event_type: eventType,
+                page: window.location.pathname,
+                referrer: document.referrer || 'direct',
+                user_agent: navigator.userAgent,
+                screen_width: window.screen.width,
+                screen_height: window.screen.height,
+                ...additionalData
+            };
+
+            // Send beacon (non-blocking, works even if user navigates away)
+            if (navigator.sendBeacon) {
+                const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+                navigator.sendBeacon(this.trackingEndpoint, blob);
+            } else {
+                // Fallback to fetch for older browsers
+                fetch(this.trackingEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                    keepalive: true
+                }).catch(err => console.warn('Tracking failed:', err));
+            }
+        } catch (err) {
+            console.warn('Tracking error:', err);
+        }
     }
 
     init() {
@@ -35,6 +78,12 @@ class MachineryOfDemocracy {
             if (chapterId) {
                 this.switchToChapter(chapterId, false);
             }
+        });
+
+        // Track initial page load
+        this.track('page_load', {
+            chapter_id: initialChapter,
+            chapter_title: this.getChapterTitle(initialChapter)
         });
     }
 
@@ -78,6 +127,12 @@ class MachineryOfDemocracy {
                 setTimeout(() => chapter.init(), 0);
             }
 
+            // Track chapter view
+            this.track('chapter_view', {
+                chapter_id: chapterId,
+                chapter_title: this.getChapterTitle(chapterId)
+            });
+
             // Scroll to top
             window.scrollTo(0, 0);
         } else {
@@ -89,6 +144,14 @@ class MachineryOfDemocracy {
                 </div>
             `;
         }
+    }
+
+    /**
+     * Get human-readable chapter title from chapter ID
+     */
+    getChapterTitle(chapterId) {
+        const button = document.querySelector(`[data-chapter="${chapterId}"]`);
+        return button ? button.textContent.trim() : chapterId;
     }
 }
 
