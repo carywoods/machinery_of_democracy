@@ -49,6 +49,7 @@ if ($origin && !in_array($origin, $allowed_origins)) {
 // Set CORS headers for allowed origin
 if ($origin) {
     header("Access-Control-Allow-Origin: $origin");
+    header('Access-Control-Allow-Credentials: true');
 }
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, X-Analytics-Token');
